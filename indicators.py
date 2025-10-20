@@ -2,7 +2,9 @@ import pandas as pd
 import ta
 
 
-def indicators(data: pd.DataFrame) -> pd.DataFrame:
+def get_indicators(data: pd.DataFrame) -> pd.DataFrame:
+
+    data = data.copy()
 
     ## Indicadores de Momentum
 

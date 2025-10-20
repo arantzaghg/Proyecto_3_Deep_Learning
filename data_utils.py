@@ -11,6 +11,7 @@ def get_asset_data(ticker: str) -> pd.DataFrame:
 
 def split_data(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
+    data = data.copy()
     train_size = int(len(data) * 0.6)
     test_size = int(len(data) * 0.2)
 
