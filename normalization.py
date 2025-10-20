@@ -1,68 +1,122 @@
 
-
-from typing import Tuple, Dict
 import pandas as pd
-import numpy as np
 
-def normalize(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict]:
-    df = df.copy()
-    params = {}
+def get_normal_stats(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    data = data.copy()
+    stats = {}
 
-    # Escalamiento 0-1
+    # Scale to range [0, 1]
     for col in ['RSI_7', 'RSI_14', 'RSI_21']:
-        if col in df.columns:
-            df[col] = df[col] / 100
+        if col in data.columns:
+            data[col] = data[col] / 100
 
     for col in ['Stoch_12', 'Stoch_26']:
-        if col in df.columns:
-            df[col] = df[col] / 100
+        if col in data.columns:
+            data[col] = data[col] / 100
 
-    # Normalización Z-score
+    # Z-score normalization
     for col in ['ROC_10', 'ROC_20']:
-        if col in df.columns:
-            params[f'mean_{col}'] = df[col].mean()
-            params[f'std_{col}'] = df[col].std()
-            df[col] = (df[col] - params[f'mean_{col}']) / params[f'std_{col}']
+        if col in data.columns:
+            stats[f'mean_{col}'] = data[col].mean()
+            stats[f'std_{col}'] = data[col].std()
+            data[col] = (data[col] - stats[f'mean_{col}']) / stats[f'std_{col}']
 
-    # Relativo al precio
+    # Relative to closing price
     for col in ['EMA_10', 'EMA_21']:
-        if col in df.columns and 'Close' in df.columns:
-            df[col] = df[col] / df['Close']
+        if col in data.columns and 'Close' in data.columns:
+            data[col] = data[col] / data['Close']
 
-    # ATR normalizado
-    if 'ATR_14' in df.columns and 'Close' in df.columns:
-        df['ATR_14'] = df['ATR_14'] / df['Close']
+    # ATR normalized by price
+    if 'ATR_14' in data.columns and 'Close' in data.columns:
+        data['ATR_14'] = data['ATR_14'] / data['Close']
 
-    # Posición en bandas de Bollinger
-    if {'BB_high_20', 'BB_low_20'}.issubset(df.columns):
-        df['BB_pos_20'] = (df['Close'] - df['BB_low_20']) / (df['BB_high_20'] - df['BB_low_20'])
-    if {'BB_high_15', 'BB_low_15'}.issubset(df.columns):
-        df['BB_pos_15'] = (df['Close'] - df['BB_low_15']) / (df['BB_high_15'] - df['BB_low_15'])
+    # Position within Bollinger Bands
+    if {'BB_high_20', 'BB_low_20'}.issubset(data.columns):
+        data['BB_pos_20'] = (data['Close'] - data['BB_low_20']) / (data['BB_high_20'] - data['BB_low_20'])
+    if {'BB_high_15', 'BB_low_15'}.issubset(data.columns):
+        data['BB_pos_15'] = (data['Close'] - data['BB_low_15']) / (data['BB_high_15'] - data['BB_low_15'])
 
-    # Posición en canal Donchian
-    if {'DON_high_20', 'DON_low_20'}.issubset(df.columns):
-        df['DON_pos_20'] = (df['Close'] - df['DON_low_20']) / (df['DON_high_20'] - df['DON_low_20'])
+    # Position within Donchian channel
+    if {'DON_high_20', 'DON_low_20'}.issubset(data.columns):
+        data['DON_pos_20'] = (data['Close'] - data['DON_low_20']) / (data['DON_high_20'] - data['DON_low_20'])
 
-    # Escalamiento 0-1
-    if 'MFI_14' in df.columns:
-        df['MFI_14'] = df['MFI_14'] / 100
+    # Scale to range [0, 1]
+    if 'MFI_14' in data.columns:
+        data['MFI_14'] = data['MFI_14'] / 100
 
-    # Min-Max
-    if 'CMF_20' in df.columns:
-        params['min_CMF_20'] = df['CMF_20'].min()
-        params['max_CMF_20'] = df['CMF_20'].max()
-        df['CMF_20'] = (df['CMF_20'] - params['min_CMF_20']) / (params['max_CMF_20'] - params['min_CMF_20'])
+    # Min-Max normalization
+    if 'CMF_20' in data.columns:
+        stats['min_CMF_20'] = data['CMF_20'].min()
+        stats['max_CMF_20'] = data['CMF_20'].max()
+        data['CMF_20'] = (data['CMF_20'] - stats['min_CMF_20']) / (stats['max_CMF_20'] - stats['min_CMF_20'])
 
-    # Normalización Z-score
+    # Z-score normalization for volume-based indicators
     for col in ['OBV', 'VPT', 'ADI']:
-        if col in df.columns:
-            params[f'mean_{col}'] = df[col].mean()
-            params[f'std_{col}'] = df[col].std()
-            df[col] = (df[col] - params[f'mean_{col}']) / params[f'std_{col}']
+        if col in data.columns:
+            stats[f'mean_{col}'] = data[col].mean()
+            stats[f'std_{col}'] = data[col].std()
+            data[col] = (data[col] - stats[f'mean_{col}']) / stats[f'std_{col}']
 
-    # Limpieza
+    # Cleanup: remove intermediate columns
+    cols_to_drop = ['BB_high_20', 'BB_low_20', 'BB_high_15', 'BB_low_15', 'DON_high_20', 'DON_low_20']
+    data = data.drop(columns=[c for c in cols_to_drop if c in data.columns])
+
+    return data, stats
+
+
+def normalize_data(data: pd.DataFrame, stats: dict) -> pd.DataFrame:
+    data = data.copy()
+
+    # Scale to range [0, 1]
+    for col in ['RSI_7', 'RSI_14', 'RSI_21']:
+        if col in data.columns:
+            data[col] = data[col] / 100
+
+    for col in ['Stoch_12', 'Stoch_26']:
+        if col in data.columns:
+            data[col] = data[col] / 100
+
+    # Z-score normalization
+    for col in ['ROC_10', 'ROC_20']:
+        if col in data.columns:
+            data[col] = (data[col] - stats[f'mean_{col}']) / stats[f'std_{col}']
+
+    # Relative to closing price
+    for col in ['EMA_10', 'EMA_21']:
+        if col in data.columns and 'Close' in data.columns:
+            data[col] = data[col] / data['Close']
+
+    # ATR normalized by price
+    if 'ATR_14' in data.columns and 'Close' in data.columns:
+        data['ATR_14'] = data['ATR_14'] / data['Close']
+
+    # Position within Bollinger Bands
+    if {'BB_high_20', 'BB_low_20'}.issubset(data.columns):
+        data['BB_pos_20'] = (data['Close'] - data['BB_low_20']) / (data['BB_high_20'] - data['BB_low_20'])
+    if {'BB_high_15', 'BB_low_15'}.issubset(data.columns):
+        data['BB_pos_15'] = (data['Close'] - data['BB_low_15']) / (data['BB_high_15'] - data['BB_low_15'])
+
+    # Position within Donchian channel
+    if {'DON_high_20', 'DON_low_20'}.issubset(data.columns):
+        data['DON_pos_20'] = (data['Close'] - data['DON_low_20']) / (data['DON_high_20'] - data['DON_low_20'])
+
+    # Scale to range [0, 1]
+    if 'MFI_14' in data.columns:
+        data['MFI_14'] = data['MFI_14'] / 100
+
+    # Min-Max normalization
+    if 'CMF_20' in data.columns:
+        data['CMF_20'] = (data['CMF_20'] - stats['min_CMF_20']) / (stats['max_CMF_20'] - stats['min_CMF_20'])
+    
+    # Z-score normalization for volume-based indicators
+    for col in ['OBV', 'VPT', 'ADI']:
+        if col in data.columns:
+            data[col] = (data[col] - stats[f'mean_{col}']) / stats[f'std_{col}']
+    
+    # Cleanup: remove intermediate columns
     cols_to_drop = ['BB_high_20', 'BB_low_20', 'BB_high_15', 'BB_low_15', 'DON_high_20', 'DON_low_20']
     df = df.drop(columns=[c for c in cols_to_drop if c in df.columns])
 
-    return df, params
+    return data
+
 
