@@ -8,12 +8,18 @@ def main():
     
     'Load Data'
     data=pd.read_csv('AAPL_data.csv')
-    data = get_indicators(data)
-    data = signals(data)
 
     train_data, test_data, val_data = split_data(data)
+    data = get_indicators(train_data)
+    data = signals(data)
+
+    print(data["signal"].value_counts())
+
 
     
+    
+
+
 
 
     
