@@ -65,7 +65,7 @@ def backtest(data: pd.DataFrame, cash: float) -> tuple[pd.Series, float, float]:
             )
 
         # Short signal
-        if row.signal==-1:
+        if row.signal==2:
                 cost = row.Close * n_shares *  COM
                 if cash > cost:
                     cash -= cost
