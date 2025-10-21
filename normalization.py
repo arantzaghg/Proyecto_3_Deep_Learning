@@ -115,7 +115,7 @@ def normalize_data(data: pd.DataFrame, stats: dict) -> pd.DataFrame:
     
     # Cleanup: remove intermediate columns
     cols_to_drop = ['BB_high_20', 'BB_low_20', 'BB_high_15', 'BB_low_15', 'DON_high_20', 'DON_low_20']
-    df = df.drop(columns=[c for c in cols_to_drop if c in df.columns])
+    data = data.drop(columns=[c for c in cols_to_drop if c in data.columns])
 
     return data
 

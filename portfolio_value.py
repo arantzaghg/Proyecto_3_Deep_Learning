@@ -1,6 +1,6 @@
 from models import Operation
 
-def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price: float) -> float:
+def get_portfolio_value(cash: float, long_ops: list[Operation], short_ops: list[Operation], current_price: float, n_shares: float) -> float:
 
     port_val = cash
 
