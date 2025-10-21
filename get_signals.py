@@ -7,8 +7,8 @@ def signals(data: pd.DataFrame) -> pd.DataFrame:
 
 
     data["signal"] = 0
-    data.loc[data["pct_change"] > 0.005, "signal"] = 1
-    data.loc[data["pct_change"] < -0.005, "signal"] = -1
+    data.loc[data["pct_change"] > 0.008, "signal"] = 1
+    data.loc[data["pct_change"] < -0.008, "signal"] = -1
 
     data.drop(columns=["pct_change"], inplace=True)
     data["signal"] = data["signal"].astype(int)
