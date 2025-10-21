@@ -4,10 +4,13 @@ import pandas as pd
 def get_asset_data(ticker: str) -> pd.DataFrame:
 
     data = yf.download(ticker, period="15y", interval="1d")
-    if 'Adj Close' in data.columns:
-        data = data.drop(columns=['Adj Close'])
-    data = data[['Open', 'High', 'Low', 'Close', 'Volume']].dropna()
-    return data
+   
+    data = data.drop(columns=['Adj Close'], errors='ignore')
+
+    data.columns = [col[0] if isinstance(col, tuple) else col for col in data.columns]
+
+    return data[['Open', 'High', 'Low', 'Close', 'Volume']].dropna()
+
 
 def split_data(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
