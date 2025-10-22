@@ -41,11 +41,12 @@ def backtest(data: pd.DataFrame, cash: float) -> tuple[pd.Series, float, float]:
         # Close SHORT positions
         for position in active_short_positions.copy():
             if (position.stop_loss < row.Close) or (position.take_profit > row.Close):
-                pnl = (position.price - row.Close) * position.n_shares * (1 - COM)
+                pnl = (position.price - row.Close) * position.n_shares
                 if pnl > 0:
                     wins += 1
                 total_trades += 1
-                cash += pnl
+                com = row.Close * position.n_shares * COM
+                cash += pnl - com
                 active_short_positions.remove(position)
         
         # Long signal
@@ -90,11 +91,12 @@ def backtest(data: pd.DataFrame, cash: float) -> tuple[pd.Series, float, float]:
         cash += row.Close * position.n_shares * (1 - COM)
     
     for position in active_short_positions.copy():
-        pnl = (position.price - row.Close) * position.n_shares * (1 - COM)
+        pnl = (position.price - row.Close) * position.n_shares
         if pnl > 0:
             wins += 1
         total_trades += 1
-        cash += pnl
+        com = row.Close * position.n_shares * COM
+        cash += pnl - com
 
     active_long_positions = []
     active_short_positions = []
