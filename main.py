@@ -28,6 +28,7 @@ def main():
     model_type = "CNN"
     model_version = "latest"
     model = mlflow.tensorflow.load_model(f"models:/{model_type}/{model_version}")
+    model.summary()
 
     y_pred_train = model.predict(x_train)
     y_pred_test = model.predict(x_test)
@@ -43,23 +44,25 @@ def main():
 
     portfolio_train, final_cash_train, win_rate_train = backtest(train_data, cash=1000000)
     portfolio_test, final_cash_test, win_rate_test = backtest(test_data, cash=1000000)
-    portfolio_val, final_cash_val, win_rate_val = backtest(val_data, cash=1000000)
+    portfolio_val, final_cash_val, win_rate_val = backtest(val_data, cash=final_cash_test)
 
-    for name, portfolio, cash, win_rate in [
-        ("TRAIN", portfolio_train, final_cash_train, win_rate_train),
-        ("TEST", portfolio_test, final_cash_test, win_rate_test),
-        ("VALIDATION", portfolio_val, final_cash_val, win_rate_val),
-    ]:
-        print(f"\n--- RESULTS: {name} ---")
-        print(f"Final cash: ${cash:,.2f}")
-        print(f"Win rate: {win_rate:.2%}")
-        print(f"Initial cash: ${1000000:,.2f}")
-        total_return = (cash / 1000000 - 1) * 100
-        print(f"Total return: {1000000:.2f}%")
+    print(f"\n--- RESULTS TRAIN: ---")
+    print(f"Final cash: ${final_cash_train:,.2f}")
+    print(f"Win rate: {win_rate_train:.2%}")
 
+    print(f"\n--- RESULTS TEST: ---")
+    print(f"Final cash: ${final_cash_test:,.2f}")
+    print(f"Win rate: {win_rate_test:.2%}")
 
+    print(f"\n--- RESULTS VALIDATION: ---")
+    print(f"Final cash: ${final_cash_val:,.2f}")
+    print(f"Win rate: {win_rate_val:.2%}")
 
+    plot_portfolio_value_train(portfolio_train)
+    plot_portfolio_value_train(portfolio_test)
+    plot_portfolio_value_train(portfolio_val)
 
+    
     
 if __name__ == "__main__":
     main()
