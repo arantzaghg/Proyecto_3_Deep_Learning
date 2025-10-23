@@ -28,9 +28,9 @@ def split_data(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
 
     return train_data, test_data, val_data
 
-def preprocess_data(data):
+def preprocess_data(data, ticker: str, alpha: float) -> pd.DataFrame:
     data = get_indicators(data)
-    data = signals(data)
+    data = signals(data, ticker, alpha)
     data, stats = get_normal_stats(data)
     data.dropna(inplace=True)
     return data

@@ -12,9 +12,9 @@ def run_models():
     train_data, test_data, val_data = split_data(data)
 
     # Generate Indicators and Signals
-    train_data = preprocess_data(train_data)
-    test_data = preprocess_data(test_data)
-    val_data = preprocess_data(val_data)
+    train_data = preprocess_data(train_data, ticker, alpha=0.016)
+    test_data = preprocess_data(test_data, ticker, alpha=0.016)
+    val_data = preprocess_data(val_data, ticker, alpha=0.016)
 
     # Get target
     x_train, y_train = get_target(train_data)
@@ -29,11 +29,11 @@ def run_models():
 
     # Train CNN models
     mlflow.set_experiment("CNN model")
-    train_signals_cnn(x_train, y_train, x_test, y_test, params_cnn, epochs=10, batch_size=32)
+    train_signals_cnn(x_train, y_train, x_test, y_test, params_cnn, epochs=50, batch_size=32)
 
     # Train MLP models
     mlflow.set_experiment("MLP model")
-    train_signals_mlp(x_train, y_train, x_test, y_test, params_mlp, epochs=10, batch_size=32)
+    train_signals_mlp(x_train, y_train, x_test, y_test, params_mlp, epochs=50, batch_size=32)
 
 if __name__ == "__main__":
     run_models()

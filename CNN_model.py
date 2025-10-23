@@ -2,7 +2,6 @@
 import tensorflow as tf
 import mlflow
 
-
 def build_model(params, input_shape):
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Input(shape=(input_shape, 1)))

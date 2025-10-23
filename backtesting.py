@@ -22,7 +22,7 @@ def backtest(data: pd.DataFrame, cash: float) -> tuple[pd.Series, float, float]:
     total_trades = 0
     wins = 0
 
-    for row in data.itertuples(index=True):
+    for i, row in enumerate(data.itertuples(index=True)):
 
         # Close LONG positions
         for position in active_long_positions.copy():
