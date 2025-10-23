@@ -1,5 +1,6 @@
 import pandas as pd
 import mlflow
+import numpy as np
 from get_signals import signals
 from indicators import get_indicators
 from data_utils import split_data
@@ -17,15 +18,15 @@ def main():
     data = get_asset_data(ticker)
     train_data, test_data, val_data = split_data(data)
 
-    train_data = preprocess_data(train_data)
-    test_data = preprocess_data(test_data)
-    val_data = preprocess_data(val_data)
+    train_data = preprocess_data(train_data, ticker=ticker, alpha=0.16) 
+    test_data = preprocess_data(test_data, ticker=ticker, alpha=0.16)
+    val_data = preprocess_data(val_data, ticker=ticker, alpha=0.16)
 
     x_train, y_train = get_target(train_data)
     x_test, y_test = get_target(test_data)
     x_val, y_val = get_target(val_data)
 
-    model_type = "CNN"
+    model_type = "Models"
     model_version = "latest"
     model = mlflow.tensorflow.load_model(f"models:/{model_type}/{model_version}")
     model.summary()
