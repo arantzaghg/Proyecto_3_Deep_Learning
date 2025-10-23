@@ -3,7 +3,7 @@ import mlflow
 
 def build_model(params, input_shape):
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Input(shape=input_shape))
+    model.add(tf.keras.layers.Input(shape=(input_shape,)))
     
     activation = params.get("activation", "relu")
     dense_layers = params.get("dense_layers", 2)
@@ -21,7 +21,7 @@ def build_model(params, input_shape):
     return model
 
 
-def get_params_space():
+def get_params_space_mlp():
     return [
         {"dense_layers": 2, "dense_units": 64, "activation": "relu"},
         {"dense_layers": 3, "dense_units": 32, "activation": "relu"},
@@ -29,22 +29,24 @@ def get_params_space():
     ]
 
 
-def train_signals_mlp(X_train, y_train, X_test, y_test):
-    input_shape = X_train.shape[1:]
+def train_signals_mlp(X_train, y_train, X_test, y_test, params_mlp, epochs=10, batch_size=32):
+
+    input_shape = X_train.shape[1]
 
     print("Training models...")
-    for params in get_params_space():
+    for params in params_mlp:
         run_name = (
             f"dense{params['dense_layers']}_units{params['dense_units']}"
             f"_activation{params['activation']}"
         )
-        with mlflow.start_run():
-            mlflow.set_tag("mlflow.runName", run_name)
+        with mlflow.start_run(run_name=run_name):
+            mlflow.set_tag("MPL", run_name)
             model = build_model(params, input_shape)
             hist = model.fit(
                 X_train, y_train,
-                epochs=2,
+                epochs=epochs,
                 validation_data=(X_test, y_test),
+                batch_size=batch_size,
                 verbose=2
             )
             final_metrics = {

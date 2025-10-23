@@ -5,7 +5,7 @@ import mlflow
 
 def build_model(params, input_shape):
     model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Input(shape=input_shape))
+    model.add(tf.keras.layers.Input(shape=(input_shape, 1)))
 
     num_filters = params.get("conv_filters", 32)
     conv_layers = params.get("conv_layers", 2)
@@ -25,7 +25,7 @@ def build_model(params, input_shape):
                   metrics=["accuracy"])
     return model
 
-def get_params_space():
+def get_params_space_cnn():
     return [
         {"conv_layers": 2, "conv_filters": 32, "activation": "relu",    "dense_units": 64},
         {"conv_layers": 3, "conv_filters": 64, "activation": "relu",    "dense_units": 32},
@@ -33,23 +33,24 @@ def get_params_space():
     ]
 
 # ------- Entrenamiento (usa MLflow ya configurado) -------
-def train_signals_cnn(X_train, y_train, X_test, y_test):
+def train_signals_cnn(X_train, y_train, X_test, y_test, params_cnn, epochs=10, batch_size=32):
 
-    input_shape = X_train.shape[1:]  # (window, n_features), si no funciona quitar :
+    input_shape = X_train.shape[1]  # (window, n_features), si no funciona quitar :
 
     print("Training models...")
-    for params in get_params_space():
+    for params in params_cnn:
         run_name = (
             f"conv{params['conv_layers']}_filters{params['conv_filters']}"
             f"_dense{params['dense_units']}_activation{params['activation']}"
         )
-        with mlflow.start_run():
-            mlflow.set_tag("mlflow.runName", run_name)
+        with mlflow.start_run(run_name=run_name):
+            mlflow.set_tag("CNN", run_name)
             model = build_model(params, input_shape)
             hist = model.fit(
                 X_train, y_train,
-                epochs=2,
+                epochs=epochs,
                 validation_data=(X_test, y_test),
+                batch_size=batch_size,
                 verbose=2
             )
             final_metrics = {
