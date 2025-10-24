@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 from indicators import get_indicators
 from get_signals import signals
-from normalization import get_normal_stats
+from normalization import get_normal_stats, normalize_data
 
 def get_asset_data(ticker: str) -> pd.DataFrame:
 
@@ -28,12 +28,19 @@ def split_data(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataF
 
     return train_data, test_data, val_data
 
-def preprocess_data(data, ticker: str, alpha: float) -> pd.DataFrame:
+def preprocess_data(data, ticker, alpha, stage: str, stats: dict | None = None, include_close: bool = True):
+
     data = get_indicators(data)
     data = signals(data, ticker, alpha)
-    data, stats = get_normal_stats(data)
+
+    if stage == "train":
+        data, stats = get_normal_stats(data, include_close=include_close)
+    else:
+        if stats is None:
+            raise ValueError("Give stats for normalization")
+        data = normalize_data(data, stats, include_close=include_close)
     data.dropna(inplace=True)
-    return data
+    return data, stats
 
 def get_target(data):
     X = data.drop(columns=['Open', 'High', 'Low', 'Volume', 'signal'])

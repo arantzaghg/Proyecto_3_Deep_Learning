@@ -15,20 +15,23 @@ from MLP_model import train_signals_mlp, get_params_space_mlp
 def main():
  
     ticker = "AMZN"
+
     data = get_asset_data(ticker)
     train_data, test_data, val_data = split_data(data)
 
-    train_data = preprocess_data(train_data, ticker=ticker, alpha=0.16) 
-    test_data = preprocess_data(test_data, ticker=ticker, alpha=0.16)
-    val_data = preprocess_data(val_data, ticker=ticker, alpha=0.16)
+    train_data = preprocess_data(train_data, ticker=ticker, alpha=0.006) 
+    test_data = preprocess_data(test_data, ticker=ticker, alpha=0.006)
+    val_data = preprocess_data(val_data, ticker=ticker, alpha=0.006)
 
     x_train, y_train = get_target(train_data)
     x_test, y_test = get_target(test_data)
     x_val, y_val = get_target(val_data)
 
-    model_type = "Models"
-    model_version = "latest"
-    model = mlflow.tensorflow.load_model(f"models:/{model_type}/{model_version}")
+    model_name = "Models"
+    model_version = 1   
+
+    model_uri = f"models:/{model_name}/{model_version}"
+    model = mlflow.tensorflow.load_model(model_uri)
     model.summary()
 
     y_pred_train = model.predict(x_train)

@@ -1,7 +1,7 @@
 
 import pandas as pd
 
-def get_normal_stats(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+def get_normal_stats(data: pd.DataFrame, include_close: bool = False) -> tuple[pd.DataFrame, dict]:
     data = data.copy()
     stats = {}
 
@@ -57,6 +57,16 @@ def get_normal_stats(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
             stats[f'std_{col}'] = data[col].std()
             data[col] = (data[col] - stats[f'mean_{col}']) / stats[f'std_{col}']
 
+    # Normalize 'Close' price
+    if include_close:
+        mean_close = data['Close'].mean()
+        std_close = data['Close'].std()
+
+        data['Close'] = (data['Close'] - mean_close) / std_close
+
+        stats['mean_close'] = mean_close
+        stats['std_close'] = std_close
+        
     # Cleanup: remove intermediate columns
     cols_to_drop = ['BB_high_20', 'BB_low_20', 'BB_high_15', 'BB_low_15', 'DON_high_20', 'DON_low_20']
     data = data.drop(columns=[c for c in cols_to_drop if c in data.columns])
@@ -64,7 +74,7 @@ def get_normal_stats(data: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     return data, stats
 
 
-def normalize_data(data: pd.DataFrame, stats: dict) -> pd.DataFrame:
+def normalize_data(data: pd.DataFrame, stats: dict, include_close: bool = False) -> pd.DataFrame:
     data = data.copy()
 
     # Scale to range [0, 1]
@@ -112,6 +122,10 @@ def normalize_data(data: pd.DataFrame, stats: dict) -> pd.DataFrame:
     for col in ['OBV', 'VPT', 'ADI']:
         if col in data.columns:
             data[col] = (data[col] - stats[f'mean_{col}']) / stats[f'std_{col}']
+
+    # Normalize 'Close' price
+    if include_close:
+        data['Close'] = (data['Close'] - stats['mean_close']) / stats['std_close']
     
     # Cleanup: remove intermediate columns
     cols_to_drop = ['BB_high_20', 'BB_low_20', 'BB_high_15', 'BB_low_15', 'DON_high_20', 'DON_low_20']
