@@ -6,7 +6,7 @@ from indicators import get_indicators
 from data_utils import split_data
 from normalization import get_normal_stats  
 from backtesting import backtest
-from plots import plot_portfolio_value_train
+from plots import plot_portfolio_value
 from data_utils import get_asset_data, preprocess_data, get_target
 from CNN_model import train_signals_cnn, get_params_space_cnn
 from MLP_model import train_signals_mlp, get_params_space_mlp
@@ -15,13 +15,12 @@ from MLP_model import train_signals_mlp, get_params_space_mlp
 def main():
  
     ticker = "AMZN"
-
     data = get_asset_data(ticker)
     train_data, test_data, val_data = split_data(data)
 
-    train_data = preprocess_data(train_data, ticker=ticker, alpha=0.006) 
-    test_data = preprocess_data(test_data, ticker=ticker, alpha=0.006)
-    val_data = preprocess_data(val_data, ticker=ticker, alpha=0.006)
+    train_data, stats = preprocess_data(train_data, ticker=ticker, alpha=0.016, stage="train", include_close=True)
+    test_data, _ = preprocess_data(test_data, ticker=ticker, alpha=0.016, stage="test", stats=stats, include_close=True)
+    val_data, _ = preprocess_data(val_data, ticker=ticker, alpha=0.016, stage="val", stats=stats, include_close=True)
 
     x_train, y_train = get_target(train_data)
     x_test, y_test = get_target(test_data)
@@ -29,8 +28,8 @@ def main():
 
     model_name = "Models"
     model_version = 1   
-
     model_uri = f"models:/{model_name}/{model_version}"
+
     model = mlflow.tensorflow.load_model(model_uri)
     model.summary()
 
@@ -62,11 +61,9 @@ def main():
     print(f"Final cash: ${final_cash_val:,.2f}")
     print(f"Win rate: {win_rate_val:.2%}")
 
-    plot_portfolio_value_train(portfolio_train)
-    plot_portfolio_value_train(portfolio_test)
-    plot_portfolio_value_train(portfolio_val)
+    plot_portfolio_value(portfolio_train, title="Train")
+    plot_portfolio_value(portfolio_test, title="Test")
+    plot_portfolio_value(portfolio_val, title="Validation")
 
-    
-    
 if __name__ == "__main__":
     main()

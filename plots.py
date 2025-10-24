@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_portfolio_value_train(portfolio_value_train) :
+def plot_portfolio_value(portfolio_value) :
 
     '''
     Plot the portfolio value over the training period.
@@ -12,8 +12,8 @@ def plot_portfolio_value_train(portfolio_value_train) :
     '''
     
     plt.figure(figsize=(10, 5))
-    plt.plot(portfolio_value_train,  color='cornflowerblue', linewidth=1.8, label='Train Portfolio')
-    plt.title('Portfolio Value over Training Period')
+    plt.plot(portfolio_value,  color='cornflowerblue', linewidth=1.8, label='Portfolio')
+    plt.title(f'{title} Portfolio Value over Time')
     plt.xlabel('Time')
     plt.ylabel('Portfolio Value')
     plt.legend()
