@@ -1,8 +1,8 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
-def plot_portfolio_value(portfolio_value) :
+def plot_portfolio_value(portfolio_value, title: str):
 
     '''
     Plot the portfolio value over the training period.
