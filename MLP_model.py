@@ -2,7 +2,8 @@ import tensorflow as tf
 import mlflow
 
 def build_model(params, input_shape):
-    model = tf.keras.Sequential()
+
+    model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Input(shape=(input_shape,)))
     
     activation = params.get("activation", "relu")
@@ -12,7 +13,7 @@ def build_model(params, input_shape):
     for _ in range(dense_layers):
         model.add(tf.keras.layers.Dense(dense_units, activation=activation))
 
-    model.add(tf.keras.layers.Dense(3, activation="softmax"))  # señal compra (1) / no compra (0)
+    model.add(tf.keras.layers.Dense(3, activation="softmax"))  
 
     model.compile(optimizer=params.get("optimizer", "adam"),
                   loss="sparse_categorical_crossentropy",
@@ -53,6 +54,5 @@ def train_signals_mlp(X_train, y_train, X_test, y_test, params_mlp, epochs=10, b
                 "val_accuracy": float(hist.history["val_accuracy"][-1]),
                 "val_loss": float(hist.history["val_loss"][-1]),
             }
+
             print(f"[{run_name}] Final metrics: {final_metrics}")
-
-
