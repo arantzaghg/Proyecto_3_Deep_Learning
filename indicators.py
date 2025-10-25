@@ -49,6 +49,6 @@ def get_indicators(data: pd.DataFrame) -> pd.DataFrame:
 
     data["MFI_14"] = ta.volume.MFIIndicator(high=data["High"], low=data["Low"], close=data["Close"], volume=data["Volume"], window=14).money_flow_index()
 
-    data["CMF_20"] = ta.volume.ChaikinMoneyFlowIndicator(high=data["High"], low=data["Low"], close=data["Close"], volume=data["Volume"], window=20).chaikin_money_flow()
+    data["CMF_21"] = ta.volume.ChaikinMoneyFlowIndicator(high=data["High"], low=data["Low"], close=data["Close"], volume=data["Volume"], window=21).chaikin_money_flow()
 
     return data

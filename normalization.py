@@ -45,10 +45,10 @@ def get_normal_stats(data: pd.DataFrame, include_close: bool = False) -> tuple[p
         data['MFI_14'] = data['MFI_14'] / 100
 
     # Min-Max normalization
-    if 'CMF_20' in data.columns:
-        stats['min_CMF_20'] = data['CMF_20'].min()
-        stats['max_CMF_20'] = data['CMF_20'].max()
-        data['CMF_20'] = (data['CMF_20'] - stats['min_CMF_20']) / (stats['max_CMF_20'] - stats['min_CMF_20'])
+    if 'CMF_21' in data.columns:
+        stats['min_CMF_21'] = data['CMF_21'].min()
+        stats['max_CMF_21'] = data['CMF_21'].max()
+        data['CMF_21'] = (data['CMF_21'] - stats['min_CMF_21']) / (stats['max_CMF_21'] - stats['min_CMF_21'])
 
     # Z-score normalization for volume-based indicators
     for col in ['OBV', 'VPT', 'ADI']:
@@ -113,8 +113,8 @@ def normalize_data(data: pd.DataFrame, stats: dict, include_close: bool = False)
         data['MFI_14'] = data['MFI_14'] / 100
 
     # Min-Max normalization
-    if 'CMF_20' in data.columns:
-        data['CMF_20'] = (data['CMF_20'] - stats['min_CMF_20']) / (stats['max_CMF_20'] - stats['min_CMF_20'])
+    if 'CMF_21' in data.columns:
+        data['CMF_21'] = (data['CMF_21'] - stats['min_CMF_21']) / (stats['max_CMF_21'] - stats['min_CMF_21'])
     
     # Z-score normalization for volume-based indicators
     for col in ['OBV', 'VPT', 'ADI']:
