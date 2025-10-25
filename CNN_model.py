@@ -1,9 +1,8 @@
-
 import tensorflow as tf
 import mlflow
 
 def build_model(params, input_shape):
-    model = tf.keras.Sequential()
+    model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Input(shape=(input_shape, 1)))
 
     num_filters = params.get("conv_filters", 32)
@@ -11,13 +10,13 @@ def build_model(params, input_shape):
     activation  = params.get("activation", "relu")
 
     for _ in range(conv_layers):
-        model.add(tf.keras.layers.Conv1D(num_filters, kernel_size=3, padding="same", activation=activation))
+        model.add(tf.keras.layers.Conv1D(num_filters, kernel_size=5, padding="causal", activation=activation))
         model.add(tf.keras.layers.MaxPooling1D(pool_size=2))
         num_filters *= 2
 
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dense(params.get("dense_units", 64), activation=activation))
-    model.add(tf.keras.layers.Dense(3, activation="softmax"))  # señal compra (1) / no compra (0)
+    model.add(tf.keras.layers.Dense(3, activation="softmax")) 
 
     model.compile(optimizer=params.get("optimizer", "adam"),
                   loss="sparse_categorical_crossentropy",
@@ -26,15 +25,17 @@ def build_model(params, input_shape):
 
 def get_params_space_cnn():
     return [
-        {"conv_layers": 2, "conv_filters": 32, "activation": "relu",    "dense_units": 64},
-        {"conv_layers": 3, "conv_filters": 64, "activation": "relu",    "dense_units": 32},
-        {"conv_layers": 2, "conv_filters": 32, "activation": "sigmoid", "dense_units": 64},
+        {"conv_layers": 3, "conv_filters": 128,  "activation": "tanh", "dense_units": 128},  
+        {"conv_layers": 3, "conv_filters": 32,  "activation": "sigmoid", "dense_units": 64},   
+        {"conv_layers": 3, "conv_filters": 96,  "activation": "relu", "dense_units": 64},   
+        {"conv_layers": 2, "conv_filters": 64,  "activation": "elu",  "dense_units": 64},   
+        {"conv_layers": 2, "conv_filters": 32,  "activation": "elu",  "dense_units": 128},  
     ]
 
-# ------- Entrenamiento (usa MLflow ya configurado) -------
+
 def train_signals_cnn(X_train, y_train, X_test, y_test, params_cnn, epochs=10, batch_size=32):
 
-    input_shape = X_train.shape[1]  # (window, n_features), si no funciona quitar :
+    input_shape = X_train.shape[1]  
 
     print("Training models...")
     for params in params_cnn:

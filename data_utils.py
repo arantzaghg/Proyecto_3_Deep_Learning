@@ -47,8 +47,3 @@ def get_target(data):
     y = data['signal']
     return X, y
 
-
-
-
-
-
