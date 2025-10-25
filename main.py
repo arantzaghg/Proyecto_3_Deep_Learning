@@ -1,15 +1,11 @@
-           import pandas as pd
+import pandas as pd
 import mlflow
 import numpy as np
-from get_signals import signals
-from indicators import get_indicators
 from data_utils import split_data
-from normalization import get_normal_stats  
 from backtesting import backtest
 from plots import plot_portfolio_value
 from data_utils import get_asset_data, preprocess_data, get_target
-from CNN_model import train_signals_cnn, get_params_space_cnn
-from MLP_model import train_signals_mlp, get_params_space_mlp
+
 
 
 def main():
@@ -19,21 +15,21 @@ def main():
     data = get_asset_data(ticker)
     train, test, val = split_data(data)
 
-    train_data, stats = preprocess_data(train, ticker, alpha=0.03, stage="train", include_close=True)
-    test_data, _ = preprocess_data(test, ticker, alpha=0.03, stage="test", stats=stats, include_close=True)
-    val_data, _ = preprocess_data(val, ticker, alpha=0.03, stage="val", stats=stats, include_close=True)
+    train_data, stats = preprocess_data(train, ticker, alpha=0.010, stage="train", include_close=True)
+    test_data, _ = preprocess_data(test, ticker, alpha=0.010, stage="test", stats=stats, include_close=True)
+    val_data, _ = preprocess_data(val, ticker, alpha=0.010, stage="val", stats=stats, include_close=True)
 
     # preprocess without normalization prices
-    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.03, stage="train", include_close=False)
-    test_data_np, _ = preprocess_data(test, ticker, alpha=0.03, stage="test", stats=stats_np, include_close=False)
-    val_data_np, _ = preprocess_data(val, ticker, alpha=0.03, stage="val", stats=stats_np, include_close=False)
+    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.010, stage="train", include_close=False)
+    test_data_np, _ = preprocess_data(test, ticker, alpha=0.010, stage="test", stats=stats_np, include_close=False)
+    val_data_np, _ = preprocess_data(val, ticker, alpha=0.010, stage="val", stats=stats_np, include_close=False)
 
     # Get target
     x_train, y_train = get_target(train_data)
     x_test, y_test = get_target(test_data)
     x_val, y_val = get_target(val_data)
 
-
+    models_to_check = ["CNN", "MLP"]
     for model_name in models_to_check:
         print(f"\n==============================")
         print(f" Evaluating model: {model_name}")
