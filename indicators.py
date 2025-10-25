@@ -14,12 +14,14 @@ def get_indicators(data: pd.DataFrame) -> pd.DataFrame:
 
     data["ROC_10"] = ta.momentum.ROCIndicator(close=data["Close"], window=10).roc()
     data["ROC_20"] = ta.momentum.ROCIndicator(close=data["Close"], window=20).roc()
+    data["ROC_45"] = ta.momentum.ROCIndicator(close=data["Close"], window=45).roc()
 
     data["EMA_10"] = ta.trend.EMAIndicator(close=data["Close"], window=10).ema_indicator()
     data["EMA_21"] = ta.trend.EMAIndicator(close=data["Close"], window=21).ema_indicator()
 
     data['Stoch_12'] = ta.momentum.StochasticOscillator(high=data["High"], low=data["Low"], close=data["Close"], window=12).stoch()
     data['Stoch_26'] = ta.momentum.StochasticOscillator(high=data["High"], low=data["Low"], close=data["Close"], window=26).stoch()
+    data['Stoch_40'] = ta.momentum.StochasticOscillator(high=data["High"], low=data["Low"], close=data["Close"], window=40).stoch()
     
     ## Indicadores de Volatilidad
 

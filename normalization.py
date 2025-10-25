@@ -1,6 +1,8 @@
 
 import pandas as pd
 
+import pandas as pd
+
 def get_normal_stats(data: pd.DataFrame, include_close: bool = False) -> tuple[pd.DataFrame, dict]:
     data = data.copy()
     stats = {}
@@ -10,12 +12,12 @@ def get_normal_stats(data: pd.DataFrame, include_close: bool = False) -> tuple[p
         if col in data.columns:
             data[col] = data[col] / 100
 
-    for col in ['Stoch_12', 'Stoch_26']:
+    for col in ['Stoch_12', 'Stoch_26', 'Stoch_40']:
         if col in data.columns:
             data[col] = data[col] / 100
 
     # Z-score normalization
-    for col in ['ROC_10', 'ROC_20']:
+    for col in ['ROC_10', 'ROC_20', 'ROC_45']:
         if col in data.columns:
             stats[f'mean_{col}'] = data[col].mean()
             stats[f'std_{col}'] = data[col].std()
@@ -30,12 +32,10 @@ def get_normal_stats(data: pd.DataFrame, include_close: bool = False) -> tuple[p
     if 'ATR_14' in data.columns and 'Close' in data.columns:
         data['ATR_14'] = data['ATR_14'] / data['Close']
 
-    # Position within Bollinger Bands
-    if {'BB_high_20', 'BB_low_20'}.issubset(data.columns):
-        data['BB_pos_20'] = (data['Close'] - data['BB_low_20']) / (data['BB_high_20'] - data['BB_low_20'])
-    if {'BB_high_15', 'BB_low_15'}.issubset(data.columns):
-        data['BB_pos_15'] = (data['Close'] - data['BB_low_15']) / (data['BB_high_15'] - data['BB_low_15'])
-
+    # Relative position within Bollinger Bands
+    data['BB_pos_20'] = (data['Close'] - data['BB_low_20']) / (data['BB_high_20'] - data['BB_low_20'])
+    data['BB_pos_15'] = (data['Close'] - data['BB_low_15']) / (data['BB_high_15'] - data['BB_low_15'])
+        
     # Position within Donchian channel
     if {'DON_high_20', 'DON_low_20'}.issubset(data.columns):
         data['DON_pos_20'] = (data['Close'] - data['DON_low_20']) / (data['DON_high_20'] - data['DON_low_20'])
@@ -82,12 +82,12 @@ def normalize_data(data: pd.DataFrame, stats: dict, include_close: bool = False)
         if col in data.columns:
             data[col] = data[col] / 100
 
-    for col in ['Stoch_12', 'Stoch_26']:
+    for col in ['Stoch_12', 'Stoch_26', 'Stoch_40']:
         if col in data.columns:
             data[col] = data[col] / 100
 
     # Z-score normalization
-    for col in ['ROC_10', 'ROC_20']:
+    for col in ['ROC_10', 'ROC_20', 'ROC_45']:
         if col in data.columns:
             data[col] = (data[col] - stats[f'mean_{col}']) / stats[f'std_{col}']
 
@@ -101,10 +101,8 @@ def normalize_data(data: pd.DataFrame, stats: dict, include_close: bool = False)
         data['ATR_14'] = data['ATR_14'] / data['Close']
 
     # Position within Bollinger Bands
-    if {'BB_high_20', 'BB_low_20'}.issubset(data.columns):
-        data['BB_pos_20'] = (data['Close'] - data['BB_low_20']) / (data['BB_high_20'] - data['BB_low_20'])
-    if {'BB_high_15', 'BB_low_15'}.issubset(data.columns):
-        data['BB_pos_15'] = (data['Close'] - data['BB_low_15']) / (data['BB_high_15'] - data['BB_low_15'])
+    data['BB_pos_20'] = (data['Close'] - data['BB_low_20']) / (data['BB_high_20'] - data['BB_low_20'])
+    data['BB_pos_15'] = (data['Close'] - data['BB_low_15']) / (data['BB_high_15'] - data['BB_low_15'])
 
     # Position within Donchian channel
     if {'DON_high_20', 'DON_low_20'}.issubset(data.columns):
