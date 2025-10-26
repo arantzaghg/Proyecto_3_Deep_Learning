@@ -5,151 +5,81 @@ import pandas as pd
 from scipy.stats import ks_2samp
 import matplotlib.pyplot as plt
 
+
 def _ensure_dir(path: str):
     os.makedirs(path, exist_ok=True)
 
-def _ensure_time_index(df: pd.DataFrame) -> pd.DataFrame:
-    if isinstance(df.index, pd.DatetimeIndex):
-        return df
-    for col in ["Date", "date", "Timestamp", "timestamp", "time", "TIME"]:
-        if col in df.columns:
-            out = df.copy()
-            out.index = pd.to_datetime(out[col], errors="coerce")
-            return out
-    raise ValueError("Se requiere un índice de tiempo o una columna de fecha ('Date').")
-
 def infer_features(df: pd.DataFrame) -> list[str]:
+    
     cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    drop_cols = {"Open", "High", "Low", "Close", "Volume", "signal", "final_signal"}
+    return [c for c in cols if c not in drop_cols]
 
-    # Excluir precios y etiquetas
-    drop_cols = {"Open", "High", "Low", "Close", "Volume", "signal"}
-    features = [c for c in cols if c not in drop_cols]
-
-    return features
-
-
-def ks_against_train(train_arr: np.ndarray, other_arr: np.ndarray) -> tuple[float, float]:
-    a = train_arr[~np.isnan(train_arr)]
-    b = other_arr[~np.isnan(other_arr)]
+def _ks(a: np.ndarray, b: np.ndarray) -> tuple[float, float]:
+    a = a[~np.isnan(a)]
+    b = b[~np.isnan(b)]
     if len(a) == 0 or len(b) == 0:
         return (np.nan, np.nan)
     stat, p = ks_2samp(a, b, alternative="two-sided", mode="auto")
     return float(stat), float(p)
 
-def time_windows(df: pd.DataFrame, window: str = "60D") -> list[pd.Timestamp, pd.Timestamp, pd.DataFrame]:
+def calculate_drift_metrics(x_train_f: pd.DataFrame, x_test_f: pd.DataFrame, alpha: float = 0.05):
+  
+    ref = x_train_f.copy()
+    cmp = x_test_f.copy()
+    feats = infer_features(ref)
     out = []
-    for period, chunk in df.sort_index().groupby(pd.Grouper(freq=window)):
-        if isinstance(period, pd.Period):
-            start, end = period.start_time, period.end_time
-        else:
-            start = pd.Timestamp(period)
-            end = start + pd.tseries.frequencies.to_offset(window) - pd.Timedelta(nanoseconds=1)
-        if len(chunk) > 0:
-            out.append((start, end, chunk))
+    for f in feats:
+        if f not in cmp.columns:
+            continue
+        stat, p = _ks(ref[f].astype(float).to_numpy(), cmp[f].astype(float).to_numpy())
+        out.append({
+            "Feature": f,
+            "KS_stat": stat,
+            "KS_pvalue": p,
+            "DriftDetected": (p < alpha) if (p == p) else False
+        })
     return out
 
-def plot_pvalues(feature: str, recs: list[dict], alpha: float, out_png: str):
-    recs = sorted(recs, key=lambda r: r["WindowStart"])
-    xs = [r["WindowStart"] for r in recs]
-    ys = [r["KS_pvalue"] for r in recs]
-    plt.figure(figsize=(8, 3))
-    plt.plot(xs, ys, marker="o")
-    plt.axhline(alpha, linestyle="--")
-    plt.title(f"KS p-values — {feature}")
-    plt.ylabel("p-value")
-    plt.xlabel("Window start")
-    plt.tight_layout()
-    plt.savefig(out_png, dpi=130)
-    plt.close()
+def calculate_drift_pvalues(x_train_f: pd.DataFrame, x_test_f: pd.DataFrame):
+   
+    ref = x_train_f.copy()
+    cmp = x_test_f.copy()
+    feats = infer_features(ref)
+    out = {}
+    for f in feats:
+        if f not in cmp.columns:
+            continue
+        _, p = _ks(ref[f].astype(float).to_numpy(), cmp[f].astype(float).to_numpy())
+        out[f] = float(p) if p == p else np.nan
+    return out
 
-def drift_table_and_plots(
-    train_df: pd.DataFrame,
-    other_df: pd.DataFrame,
-    split_name: str = "test",
-    window: str = "30D",
-    alpha: float = 0.05,
-    out_dir: str = "drift_simple_report"
-) -> pd.DataFrame:
-    
-    train_df = _ensure_time_index(train_df.copy())
-    other_df = _ensure_time_index(other_df.copy())
-
-    features = infer_features(train_df)
-    _ensure_dir(out_dir)
+def plot_histograms_all(train_df: pd.DataFrame, test_df: pd.DataFrame, val_df: pd.DataFrame | None, features: list[str], out_dir: str = "drift_simple_report"):
+   
     _ensure_dir(os.path.join(out_dir, "plots"))
 
-    tw = time_windows(other_df, window=window)
-    rows = []
     for feat in features:
-        train_arr = train_df[feat].astype(float).to_numpy()
-        recs_feat = []
-        for (ws, we, chunk) in tw:
-            stat, p = ks_against_train(train_arr, chunk[feat].astype(float).to_numpy())
-            rows.append({
-                "Feature": feat,
-                "Split": split_name,
-                "WindowStart": ws,
-                "WindowEnd": we,
-                "KS_stat": stat,
-                "KS_pvalue": p,
-                "DriftDetected": (p < alpha) if (p == p) else False  # p==p filtra NaN
-            })
-            recs_feat.append({"WindowStart": ws, "KS_pvalue": p})
-        
-        plot_pvalues(
-            feat,
-            recs_feat,
-            alpha,
-            os.path.join(out_dir, "plots", f"{feat}_pvalues_{split_name}.png")
-        )
-
-    df_out = pd.DataFrame(rows).sort_values(["Feature", "WindowStart"])
-    df_out.to_csv(os.path.join(out_dir, f"drift_stats_{split_name}.csv"), index=False)
-    return df_out
-
-def summarize_top5(df_test: pd.DataFrame, df_val: pd.DataFrame = None, top_k: int = 5) -> pd.DataFrame:
-   
-    frames = [df_test]
-    if df_val is not None:
-        frames.append(df_val)
-    all_df = pd.concat(frames, ignore_index=True)
-    agg = (
-        all_df.groupby("Feature", as_index=False)
-        .agg(min_pvalue=("KS_pvalue", "min"),
-             drift_windows=("DriftDetected", "sum"))
-        .sort_values(["min_pvalue", "drift_windows"], ascending=[True, False])
-        .head(top_k)
-    )
-    return agg
-
-def plot_histograms_all(train_df: pd.DataFrame, test_df: pd.DataFrame, val_df: pd.DataFrame,
-                        features: list[str], out_dir: str = "drift_simple_report"):
-   
-
-    os.makedirs(os.path.join(out_dir, "plots"), exist_ok=True)
-
-    for feat in features:
-        if feat not in train_df.columns or feat not in test_df.columns or feat not in val_df.columns:
+        if feat not in train_df.columns or feat not in test_df.columns:
             continue
 
         a = train_df[feat].to_numpy(dtype=float)
         b = test_df[feat].to_numpy(dtype=float)
-        c = val_df[feat].to_numpy(dtype=float)
-
         a = a[~np.isnan(a)]
         b = b[~np.isnan(b)]
-        c = c[~np.isnan(c)]
+        c = None
+        if val_df is not None and feat in val_df.columns:
+            c = val_df[feat].to_numpy(dtype=float)
+            c = c[~np.isnan(c)]
 
-        if len(a) == 0: 
+        if len(a) == 0:
             continue
 
         plt.figure(figsize=(8, 3))
         bins = 30
-    
         plt.hist(a, bins=bins, alpha=0.4, density=True, label="train")
         if len(b) > 0:
             plt.hist(b, bins=bins, alpha=0.4, density=True, label="test")
-        if len(c) > 0:
+        if c is not None and len(c) > 0:
             plt.hist(c, bins=bins, alpha=0.4, density=True, label="val")
 
         plt.title(f"Histogram — {feat} (train vs test vs val)")
@@ -160,3 +90,67 @@ def plot_histograms_all(train_df: pd.DataFrame, test_df: pd.DataFrame, val_df: p
         plt.savefig(os.path.join(out_dir, "plots", f"{feat}_hist_all.png"), dpi=130)
         plt.close()
 
+def pvalue_plots_from_results(pvalues_windows: list[dict], alpha: float, out_dir: str, split_name: str = "backtest"):
+    
+    if not pvalues_windows:
+        return
+    df = pd.DataFrame(pvalues_windows)
+    _ensure_dir(os.path.join(out_dir, "plots"))
+    for feat, grp in df.groupby("Feature"):
+        grp = grp.sort_values("WindowStartIdx")
+        plt.figure(figsize=(8, 3))
+        plt.plot(grp["WindowStartIdx"], grp["KS_pvalue"], marker="o")
+        plt.axhline(alpha, linestyle="--")
+        plt.title(f"KS p-values — {feat}")
+        plt.xlabel("Window start (idx)")
+        plt.ylabel("p-value")
+        plt.tight_layout()
+        plt.savefig(os.path.join(out_dir, "plots", f"{feat}_pvalues_{split_name}.png"), dpi=130)
+        plt.close()
+
+def summarize_drift(pvalues_windows: list[dict], alpha: float) -> pd.DataFrame:
+    
+    if not pvalues_windows:
+        return pd.DataFrame(columns=["Feature","windows","below_alpha","drift_rate","min_pvalue","median_pvalue"])
+
+    df = pd.DataFrame(pvalues_windows)
+    if "Feature" not in df.columns or "KS_pvalue" not in df.columns:
+        raise ValueError("Se esperaban columnas 'Feature' y 'KS_pvalue' en pvalues_windows")
+
+    agg = (
+        df.groupby("Feature", as_index=False)
+          .agg(
+              windows=("KS_pvalue", "size"),
+              below_alpha=("KS_pvalue", lambda s: np.sum(s < alpha)),
+              drift_rate=("KS_pvalue", lambda s: float(np.mean(s < alpha))),
+              min_pvalue=("KS_pvalue", "min"),
+              median_pvalue=("KS_pvalue", "median"),
+          )
+    )
+    # Orden principal: mayor tasa de drift; desempate: menor p-valor mínimo
+    agg = agg.sort_values(["drift_rate", "min_pvalue"], ascending=[False, True], kind="mergesort")
+    return agg.reset_index(drop=True)
+
+def save_top5_tables(summary_df: pd.DataFrame, out_csv_path: str) -> pd.DataFrame:
+    """Guarda el Top-5 a CSV y devuelve el DF del Top-5."""
+    top5 = summary_df.head(5).copy()
+    os.makedirs(os.path.dirname(out_csv_path), exist_ok=True)
+    top5.to_csv(out_csv_path, index=False)
+    return top5
+
+def plot_top5_drift_rate(top5_df: pd.DataFrame, out_png_path: str, split_name: str):
+    """
+    Grafica drift_rate de las Top-5 features.
+    """
+    if top5_df.empty:
+        return
+    plt.figure(figsize=(8, 3))
+    # Ordenamos de mayor a menor para una barra más clara
+    plot_df = top5_df.sort_values("drift_rate", ascending=True)
+    plt.barh(plot_df["Feature"], plot_df["drift_rate"], color="cornflowerblue")
+    plt.title(f"Top-5 drift rate — {split_name}")
+    plt.xlabel("Proporción de ventanas con p < α")
+    plt.tight_layout()
+    os.makedirs(os.path.dirname(out_png_path), exist_ok=True)
+    plt.savefig(out_png_path, dpi=130)
+    plt.close()

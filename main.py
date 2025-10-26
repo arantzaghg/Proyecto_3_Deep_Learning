@@ -15,14 +15,14 @@ def main():
     data = get_asset_data(ticker)
     train, test, val = split_data(data)
 
-    train_data, stats = preprocess_data(train, ticker, alpha=0.010, stage="train", include_close=True)
-    test_data, _ = preprocess_data(test, ticker, alpha=0.010, stage="test", stats=stats, include_close=True)
-    val_data, _ = preprocess_data(val, ticker, alpha=0.010, stage="val", stats=stats, include_close=True)
+    train_data, stats = preprocess_data(train, ticker, alpha=0.026, stage="train", include_close=True)
+    test_data, _ = preprocess_data(test, ticker, alpha=0.026, stage="test", stats=stats, include_close=True)
+    val_data, _ = preprocess_data(val, ticker, alpha=0.026, stage="val", stats=stats, include_close=True)
 
     # preprocess without normalization prices
-    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.010, stage="train", include_close=False)
-    test_data_np, _ = preprocess_data(test, ticker, alpha=0.010, stage="test", stats=stats_np, include_close=False)
-    val_data_np, _ = preprocess_data(val, ticker, alpha=0.010, stage="val", stats=stats_np, include_close=False)
+    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.026, stage="train", include_close=False)
+    test_data_np, _ = preprocess_data(test, ticker, alpha=0.026, stage="test", stats=stats_np, include_close=False)
+    val_data_np, _ = preprocess_data(val, ticker, alpha=0.026, stage="val", stats=stats_np, include_close=False)
 
     # Get target
     x_train, y_train = get_target(train_data)
@@ -51,7 +51,7 @@ def main():
         val_data_np["signal"] = np.argmax(y_hat_val, axis=1)
 
                 # --- Backtest ---
-        portfolio_train, final_cash_train, win_rate_train, _, _, _, _ = backtest(train_data_np, cash=1_000_000)
+        portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, total_trades_train = backtest(train_data_np, cash=1_000_000)
         portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, total_trades_test = backtest(test_data_np, cash=1_000_000)
         portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, total_trades_val = backtest(val_data_np, cash=final_cash_test)
 
@@ -63,6 +63,7 @@ def main():
 
         # --- Trade stats ---
         print(f"\n--- TRADE STATISTICS ---")
+        print(f"Train set→ Buys: {buy_train:,} | Sells: {sell_train:,} | Holds: {hold_train:,} | Total trades: {total_trades_train:,}")
         print(f"Test set  → Buys: {buy_test:,} | Sells: {sell_test:,} | Holds: {hold_test:,} | Total trades: {total_trades_test:,}")
         print(f"Val set   → Buys: {buy_val:,}  | Sells: {sell_val:,}  | Holds: {hold_val:,}  | Total trades: {total_trades_val:,}")
 

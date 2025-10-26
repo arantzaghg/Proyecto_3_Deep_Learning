@@ -12,8 +12,8 @@ def run_models():
     train_data, test_data, val_data = split_data(data)
 
     # Generate Indicators and Signals
-    train_data, stats = preprocess_data(train_data, ticker, alpha=0.010, stage="train", include_close=True)
-    test_data, _ = preprocess_data(test_data, ticker, alpha=0.010, stage="test", stats=stats, include_close=True)
+    train_data, stats = preprocess_data(train_data, ticker, alpha=0.026, stage="train", include_close=True)
+    test_data, _ = preprocess_data(test_data, ticker, alpha=0.026, stage="test", stats=stats, include_close=True)
 
     # Get target
     x_train, y_train = get_target(train_data)
