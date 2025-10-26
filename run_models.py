@@ -9,11 +9,11 @@ def run_models():
     # Load Data
     ticker = "SONY"
     data = get_asset_data(ticker)
-    train_data, test_data, val_data = split_data(data)
+    train_data, test_data,_ = split_data(data)
 
     # Generate Indicators and Signals
-    train_data, stats = preprocess_data(train_data, ticker, alpha=0.026, stage="train", include_close=True)
-    test_data, _ = preprocess_data(test_data, ticker, alpha=0.026, stage="test", stats=stats, include_close=True)
+    train_data, stats = preprocess_data(train_data, ticker, alpha=0.0015, stage="train", include_close=True)
+    test_data, _ = preprocess_data(test_data, ticker, alpha=0.0015, stage="test", stats=stats, include_close=True)
 
     # Get target
     x_train, y_train = get_target(train_data)

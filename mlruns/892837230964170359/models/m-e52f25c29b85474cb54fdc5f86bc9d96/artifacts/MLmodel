@@ -1,0 +1,22 @@
+artifact_path: file:///C:/Users/Alejandro/Documents/ITESO/Proyecto_3_Deep_Learning/mlruns/892837230964170359/models/m-e52f25c29b85474cb54fdc5f86bc9d96/artifacts
+flavors:
+  python_function:
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.tensorflow
+    python_version: 3.13.7
+  tensorflow:
+    code: null
+    data: data
+    keras_version: 2.20.0
+    model_type: keras
+    save_format: tf
+mlflow_version: 3.5.1
+model_id: m-e52f25c29b85474cb54fdc5f86bc9d96
+model_size_bytes: 660553
+model_uuid: m-e52f25c29b85474cb54fdc5f86bc9d96
+prompts: null
+run_id: 6fd6a408f8ac4d77857e07dffa976c38
+utc_time_created: '2025-10-26 08:42:37.361518'

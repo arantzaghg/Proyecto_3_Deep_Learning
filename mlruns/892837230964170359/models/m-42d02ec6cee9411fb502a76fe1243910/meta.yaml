@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/Alejandro/Documents/ITESO/Proyecto_3_Deep_Learning/mlruns/892837230964170359/models/m-42d02ec6cee9411fb502a76fe1243910/artifacts
+creation_timestamp: 1761465865699
+experiment_id: '892837230964170359'
+last_updated_timestamp: 1761465957787
+model_id: m-42d02ec6cee9411fb502a76fe1243910
+model_type: null
+name: model
+source_run_id: 3614964baec9487a96a178c53e5819b9
+status: 2
+status_message: null

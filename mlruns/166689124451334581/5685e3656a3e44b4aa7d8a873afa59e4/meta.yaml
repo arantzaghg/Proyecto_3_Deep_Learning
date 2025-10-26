@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/Alejandro/Documents/ITESO/Proyecto_3_Deep_Learning/mlruns/166689124451334581/5685e3656a3e44b4aa7d8a873afa59e4/artifacts
+end_time: 1761497437848
+entry_point_name: ''
+experiment_id: '166689124451334581'
+lifecycle_stage: active
+run_id: 5685e3656a3e44b4aa7d8a873afa59e4
+run_name: dense3_units32_activationrelu
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761497372473
+status: 3
+tags: []
+user_id: Alejandro

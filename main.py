@@ -15,14 +15,14 @@ def main():
     data = get_asset_data(ticker)
     train, test, val = split_data(data)
 
-    train_data, stats = preprocess_data(train, ticker, alpha=0.026, stage="train", include_close=True)
-    test_data, _ = preprocess_data(test, ticker, alpha=0.026, stage="test", stats=stats, include_close=True)
-    val_data, _ = preprocess_data(val, ticker, alpha=0.026, stage="val", stats=stats, include_close=True)
+    train_data, stats = preprocess_data(train, ticker, alpha=0.0015, stage="train", include_close=True)
+    test_data, _ = preprocess_data(test, ticker, alpha=0.0015, stage="test", stats=stats, include_close=True)
+    val_data, _ = preprocess_data(val, ticker, alpha=0.0015, stage="val", stats=stats, include_close=True)
 
     # preprocess without normalization prices
-    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.026, stage="train", include_close=False)
-    test_data_np, _ = preprocess_data(test, ticker, alpha=0.026, stage="test", stats=stats_np, include_close=False)
-    val_data_np, _ = preprocess_data(val, ticker, alpha=0.026, stage="val", stats=stats_np, include_close=False)
+    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.0015, stage="train", include_close=False)
+    test_data_np, _ = preprocess_data(test, ticker, alpha=0.0015, stage="test", stats=stats_np, include_close=False)
+    val_data_np, _ = preprocess_data(val, ticker, alpha=0.0015, stage="val", stats=stats_np, include_close=False)
 
     # Get target
     x_train, y_train = get_target(train_data)
@@ -51,9 +51,9 @@ def main():
         val_data_np["signal"] = np.argmax(y_hat_val, axis=1)
 
                 # --- Backtest ---
-        portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, total_trades_train = backtest(train_data_np, cash=1_000_000)
-        portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, total_trades_test = backtest(test_data_np, cash=1_000_000)
-        portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, total_trades_val = backtest(val_data_np, cash=final_cash_test)
+        portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, total_trades_train, _, _ = backtest(train_data_np, cash=1_000_000)
+        portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, total_trades_test, _, _ = backtest(test_data_np, cash=1_000_000)
+        portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, total_trades_val, _, _ = backtest(val_data_np, cash=final_cash_test)
 
         # --- Results ---
         print(f"\n--- RESULTS {model_name.upper()} ---")
@@ -70,6 +70,8 @@ def main():
         plot_portfolio_value(portfolio_train, title="Train")
         plot_portfolio_value(portfolio_test, title="Test")
         plot_portfolio_value(portfolio_val, title="Validation")
+
+        
 
 if __name__ == "__main__":
     main()

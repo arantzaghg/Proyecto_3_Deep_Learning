@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/Alejandro/Documents/ITESO/Proyecto_3_Deep_Learning/mlruns/892837230964170359/c67d8e18f2bc45b5a15f6e423acd369a/artifacts
+end_time: 1761499735803
+entry_point_name: ''
+experiment_id: '892837230964170359'
+lifecycle_stage: active
+run_id: c67d8e18f2bc45b5a15f6e423acd369a
+run_name: conv3_filters96_dense128_activationtanh
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1761499675034
+status: 3
+tags: []
+user_id: Alejandro
