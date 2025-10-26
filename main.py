@@ -3,9 +3,8 @@ import mlflow
 import numpy as np
 from data_utils import split_data
 from backtesting import backtest
-from plots import plot_portfolio_value
+from plots import plot_portfolio_value, plot_test_validation, plot_individual_bars, plot_returns
 from data_utils import get_asset_data, preprocess_data, get_target
-
 
 
 def main():
@@ -68,10 +67,13 @@ def main():
         print(f"Val set   → Buys: {buy_val:,}  | Sells: {sell_val:,}  | Holds: {hold_val:,}  | Total trades: {total_trades_val:,}")
 
         plot_portfolio_value(portfolio_train, title="Train")
-        plot_portfolio_value(portfolio_test, title="Test")
-        plot_portfolio_value(portfolio_val, title="Validation")
+        plot_test_validation(portfolio_test, portfolio_val, test, val)
+        plot_individual_bars(buy_train, sell_train, hold_train)
+        plot_individual_bars(buy_test, sell_test, hold_test)
+        plot_individual_bars(buy_val, sell_val, hold_val)
+        plot_returns(portfolio_test)
+        plot_returns(portfolio_val)
+   
 
-        
-
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
