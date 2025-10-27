@@ -30,7 +30,7 @@ def main():
     x_val, y_val = get_target(val_data)
 
     model_name = "CNN"
-    version = 31
+    version = 47
 
     print(f"\n==============================")
     print(f" Evaluating model: {model_name} (version {version})")
@@ -52,9 +52,9 @@ def main():
     val_data_np["signal"] = np.argmax(y_hat_val, axis=1)
 
     # --- Backtest ---
-    portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, total_trades_train, _, _ = backtest(train_data_np, cash=1_000_000)
-    portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, total_trades_test, _, _ = backtest(test_data_np, cash=1_000_000)
-    portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, total_trades_val, _, _ = backtest(val_data_np, cash=final_cash_test)
+    portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, _, _, _ = backtest(train_data_np, cash=1_000_000)
+    portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, _, _, _ = backtest(test_data_np, cash=1_000_000)
+    portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, _, _, _ = backtest(val_data_np, cash=final_cash_test)
 
     # --- Results ---
     print(f"\n--- RESULTS {model_name.upper()} ---")

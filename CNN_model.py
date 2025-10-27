@@ -1,5 +1,7 @@
 import tensorflow as tf
 import mlflow
+import numpy as np
+from sklearn.metrics import f1_score, accuracy_score
 
 def build_model(params, input_shape):
     model = tf.keras.models.Sequential()
@@ -31,7 +33,7 @@ def get_params_space_cnn():
     ]
 
 
-def train_signals_cnn(X_train, y_train, X_test, y_test, params_cnn, epochs=10, batch_size=32):
+def train_signals_cnn(X_train, y_train, X_test, y_test, X_val, y_val, params_cnn, epochs=10, batch_size=32):
 
     input_shape = X_train.shape[1]  
 
@@ -51,6 +53,25 @@ def train_signals_cnn(X_train, y_train, X_test, y_test, params_cnn, epochs=10, b
                 batch_size=batch_size,
                 verbose=2
             )
+
+            y_pred_probs_test = model.predict(X_test)
+            y_pred_test = np.argmax(y_pred_probs_test, axis=1)
+
+            y_pred_probs_val = model.predict(X_val)
+            y_pred_val = np.argmax(y_pred_probs_val, axis=1)
+
+            f1_test = f1_score(y_test, y_pred_test, average="weighted")
+            test_accuracy = accuracy_score(y_test, y_pred_test)
+
+            f1_val = f1_score(y_val, y_pred_val, average="weighted")
+
+            
+            mlflow.log_metrics({
+                "val_f1_score": f1_test,
+                "test_accuracy": float(test_accuracy),
+                "test_f1_score": float(f1_val),
+            })
+
             final_metrics = {
                 "val_accuracy": float(hist.history["val_accuracy"][-1]),
                 "val_loss": float(hist.history["val_loss"][-1]),
