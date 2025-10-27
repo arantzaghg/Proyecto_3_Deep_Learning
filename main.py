@@ -5,6 +5,7 @@ from data_utils import split_data
 from backtesting import backtest
 from plots import plot_portfolio_value, plot_test_validation, plot_individual_bars, plot_returns
 from data_utils import get_asset_data, preprocess_data, get_target
+from metrics import all_metrics
 
 
 def main():
@@ -28,53 +29,60 @@ def main():
     x_test, y_test = get_target(test_data)
     x_val, y_val = get_target(val_data)
 
-    models_to_check = {"CNN": 31,"MLP": 26}
+    model_name = "CNN"
+    version = 31
 
-    for model_name, version in models_to_check.items():
-        print(f"\n==============================")
-        print(f" Evaluating model: {model_name} (version {version})")
-        print(f"==============================")
+    print(f"\n==============================")
+    print(f" Evaluating model: {model_name} (version {version})")
+    print(f"==============================")
 
-        # --- Load specific version ---
-        model_uri = f"models:/{model_name}/{version}"
-        model = mlflow.tensorflow.load_model(model_uri)
-        model.summary()
+    # --- Load specific version ---
+    model_uri = f"models:/{model_name}/{version}"
+    model = mlflow.tensorflow.load_model(model_uri)
+    model.summary()
 
-        # --- Predictions ---
-        y_hat_train = model.predict(x_train)
-        y_hat_test = model.predict(x_test)
-        y_hat_val = model.predict(x_val)
+    # --- Predictions ---
+    y_hat_train = model.predict(x_train)
+    y_hat_test = model.predict(x_test)
+    y_hat_val = model.predict(x_val)
 
-        # --- Classify ---
-        train_data_np["signal"] = np.argmax(y_hat_train, axis=1)
-        test_data_np["signal"] = np.argmax(y_hat_test, axis=1)
-        val_data_np["signal"] = np.argmax(y_hat_val, axis=1)
+    # --- Classify ---
+    train_data_np["signal"] = np.argmax(y_hat_train, axis=1)
+    test_data_np["signal"] = np.argmax(y_hat_test, axis=1)
+    val_data_np["signal"] = np.argmax(y_hat_val, axis=1)
 
-                # --- Backtest ---
-        portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, total_trades_train, _, _ = backtest(train_data_np, cash=1_000_000)
-        portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, total_trades_test, _, _ = backtest(test_data_np, cash=1_000_000)
-        portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, total_trades_val, _, _ = backtest(val_data_np, cash=final_cash_test)
+    # --- Backtest ---
+    portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, total_trades_train, _, _ = backtest(train_data_np, cash=1_000_000)
+    portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, total_trades_test, _, _ = backtest(test_data_np, cash=1_000_000)
+    portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, total_trades_val, _, _ = backtest(val_data_np, cash=final_cash_test)
 
-        # --- Results ---
-        print(f"\n--- RESULTS {model_name.upper()} ---")
-        print(f"Train cash: ${final_cash_train:,.2f} | Win rate: {win_rate_train:.2%}")
-        print(f"Test  cash: ${final_cash_test:,.2f} | Win rate: {win_rate_test:.2%}")
-        print(f"Val   cash: ${final_cash_val:,.2f} | Win rate: {win_rate_val:.2%}")
+    # --- Results ---
+    print(f"\n--- RESULTS {model_name.upper()} ---")
+    print(f"Train cash: ${final_cash_train:,.2f} | Win rate: {win_rate_train:.2%}")
+    print(f"Test  cash: ${final_cash_test:,.2f} | Win rate: {win_rate_test:.2%}")
+    print(f"Val   cash: ${final_cash_val:,.2f} | Win rate: {win_rate_val:.2%}")
 
-        # --- Trade stats ---
-        print(f"\n--- TRADE STATISTICS ---")
-        print(f"Train set→ Buys: {buy_train:,} | Sells: {sell_train:,} | Holds: {hold_train:,} | Total trades: {total_trades_train:,}")
-        print(f"Test set  → Buys: {buy_test:,} | Sells: {sell_test:,} | Holds: {hold_test:,} | Total trades: {total_trades_test:,}")
-        print(f"Val set   → Buys: {buy_val:,}  | Sells: {sell_val:,}  | Holds: {hold_val:,}  | Total trades: {total_trades_val:,}")
+    # --- Trade stats ---
+    print(f"\n--- TRADE STATISTICS ---")
+    print(f"Train set→ Buys: {buy_train:,} | Sells: {sell_train:,} | Holds: {hold_train:,}")
+    print(f"Test set  → Buys: {buy_test:,} | Sells: {sell_test:,} | Holds: {hold_test:,}")
+    print(f"Val set   → Buys: {buy_val:,}  | Sells: {sell_val:,}  | Holds: {hold_val:,}")
 
-        plot_portfolio_value(portfolio_train, title="Train")
-        plot_test_validation(portfolio_test, portfolio_val, test, val)
-        plot_individual_bars(buy_train, sell_train, hold_train)
-        plot_individual_bars(buy_test, sell_test, hold_test)
-        plot_individual_bars(buy_val, sell_val, hold_val)
-        plot_returns(portfolio_test)
-        plot_returns(portfolio_val)
-   
+    # --- Metrics---
+    print(f"\n--- METRICS ---")
 
-if __name__ == "__main__":
+    total_portfolio = pd.concat([portfolio_test, portfolio_val], ignore_index=True)
+    print(all_metrics(total_portfolio))
+
+    # --- Plots ---
+    plot_portfolio_value(portfolio_train, title="Train")
+    plot_test_validation(portfolio_test, portfolio_val, test, val)
+    plot_individual_bars(buy_train, sell_train, hold_train)
+    plot_individual_bars(buy_test, sell_test, hold_test)
+    plot_individual_bars(buy_val, sell_val, hold_val)
+    plot_returns(portfolio_test)
+    plot_returns(portfolio_val)
+
+
+if _name_ == "_main_":
     main()
