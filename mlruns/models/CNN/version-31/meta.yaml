@@ -1,0 +1,15 @@
+creation_timestamp: 1761520642525
+current_stage: None
+deployment_job_state: null
+description: ''
+last_updated_timestamp: 1761520642525
+model_id: m-9925f1520d2d499eb886235986e5ac98
+name: CNN
+run_id: 806b9d0d78f841d6926a0cca74706639
+run_link: ''
+source: file:///C:/Users/Alejandro/Documents/ITESO/Proyecto_3_Deep_Learning/mlruns/892837230964170359/models/m-9925f1520d2d499eb886235986e5ac98/artifacts
+status: READY
+status_message: null
+storage_location: file:///C:/Users/Alejandro/Documents/ITESO/Proyecto_3_Deep_Learning/mlruns/892837230964170359/models/m-9925f1520d2d499eb886235986e5ac98/artifacts
+user_id: null
+version: 31

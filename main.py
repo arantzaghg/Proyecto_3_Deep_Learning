@@ -10,18 +10,18 @@ from data_utils import get_asset_data, preprocess_data, get_target
 def main():
     
     # Get Data
-    ticker = "SONY"
+    ticker = "DIS"
     data = get_asset_data(ticker)
     train, test, val = split_data(data)
 
-    train_data, stats = preprocess_data(train, ticker, alpha=0.0015, stage="train", include_close=True)
-    test_data, _ = preprocess_data(test, ticker, alpha=0.0015, stage="test", stats=stats, include_close=True)
-    val_data, _ = preprocess_data(val, ticker, alpha=0.0015, stage="val", stats=stats, include_close=True)
+    train_data, stats = preprocess_data(train, ticker, alpha=0.0011, stage="train", include_close=True)
+    test_data, _ = preprocess_data(test, ticker, alpha=0.0011, stage="test", stats=stats, include_close=True)
+    val_data, _ = preprocess_data(val, ticker, alpha=0.0011, stage="val", stats=stats, include_close=True)
 
     # preprocess without normalization prices
-    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.0015, stage="train", include_close=False)
-    test_data_np, _ = preprocess_data(test, ticker, alpha=0.0015, stage="test", stats=stats_np, include_close=False)
-    val_data_np, _ = preprocess_data(val, ticker, alpha=0.0015, stage="val", stats=stats_np, include_close=False)
+    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.0011, stage="train", include_close=False)
+    test_data_np, _ = preprocess_data(test, ticker, alpha=0.0011, stage="test", stats=stats_np, include_close=False)
+    val_data_np, _ = preprocess_data(val, ticker, alpha=0.0011, stage="val", stats=stats_np, include_close=False)
 
     # Get target
     x_train, y_train = get_target(train_data)
@@ -75,5 +75,5 @@ def main():
         plot_returns(portfolio_val)
    
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
