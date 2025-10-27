@@ -104,7 +104,17 @@ def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = No
                 initial = idx - windows
                 end = idx
 
+                # Ventana de comparación en TEST
                 df_with_window = x_test_f.iloc[initial:end]
+
+                # === Fechas (si el índice es convertible a datetime) ===
+                # Tomamos la fecha de inicio (fila 'initial') y fin (fila 'end-1')
+                try:
+                    start_dt = pd.to_datetime(x_test_f.index[initial], errors="coerce")
+                    end_dt   = pd.to_datetime(x_test_f.index[end - 1], errors="coerce")
+                except Exception:
+                    start_dt = pd.NaT
+                    end_dt   = pd.NaT
 
                 drift_metrics = calculate_drift_metrics(x_train_f, df_with_window, alpha=alpha)
                 p_values = calculate_drift_pvalues(x_train_f, df_with_window)
@@ -113,6 +123,11 @@ def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = No
                     out_row = dict(rec)
                     out_row["WindowStartIdx"] = initial
                     out_row["WindowEndIdx"] = end
+                    # Guarda las fechas si son válidas
+                    if pd.notna(start_dt):
+                        out_row["WindowStartDate"] = start_dt  # o start_dt.date() si solo quieres fecha
+                    if pd.notna(end_dt):
+                        out_row["WindowEndDate"] = end_dt
                     data_drift_results.append(out_row)
 
                 for feat, pv in p_values.items():
@@ -122,7 +137,12 @@ def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = No
                         "WindowStartIdx": initial,
                         "WindowEndIdx": end
                     }
+                    if pd.notna(start_dt):
+                        pvr["WindowStartDate"] = start_dt
+                    if pd.notna(end_dt):
+                        pvr["WindowEndDate"] = end_dt
                     p_values_results.append(pvr)
+
 
     # Close remaining  long positions at the end
     for position in active_long_positions:

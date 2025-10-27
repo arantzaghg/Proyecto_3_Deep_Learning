@@ -91,19 +91,35 @@ def plot_histograms_all(train_df: pd.DataFrame, test_df: pd.DataFrame, val_df: p
         plt.close()
 
 def pvalue_plots_from_results(pvalues_windows: list[dict], alpha: float, out_dir: str, split_name: str = "backtest"):
-    
     if not pvalues_windows:
         return
+
     df = pd.DataFrame(pvalues_windows)
     _ensure_dir(os.path.join(out_dir, "plots"))
+
+    # Si existe la columna de fecha, la convertimos una vez
+    has_date = "WindowStartDate" in df.columns
+    if has_date:
+        df["WindowStartDate"] = pd.to_datetime(df["WindowStartDate"], errors="coerce")
+
     for feat, grp in df.groupby("Feature"):
-        grp = grp.sort_values("WindowStartIdx")
+        # Ordenar por fecha si hay fecha; si no, por índice
+        if has_date:
+            grp = grp.sort_values(["WindowStartDate", "WindowStartIdx"])
+            x_vals = grp["WindowStartDate"]
+            x_label = "Dates"
+        else:
+            grp = grp.sort_values("WindowStartIdx")
+            x_vals = grp["WindowStartIdx"]
+            x_label = "Window start (idx)"
+
         plt.figure(figsize=(8, 3))
-        plt.plot(grp["WindowStartIdx"], grp["KS_pvalue"], marker="o")
-        plt.axhline(alpha, linestyle="--")
+        plt.plot(x_vals, grp["KS_pvalue"], marker="o")
+        plt.axhline(alpha, linestyle="--", color="blue")
         plt.title(f"KS p-values — {feat}")
-        plt.xlabel("Window start (idx)")
+        plt.xlabel(x_label)
         plt.ylabel("p-value")
+        plt.legend(loc="best")
         plt.tight_layout()
         plt.savefig(os.path.join(out_dir, "plots", f"{feat}_pvalues_{split_name}.png"), dpi=130)
         plt.close()
@@ -132,16 +148,13 @@ def summarize_drift(pvalues_windows: list[dict], alpha: float) -> pd.DataFrame:
     return agg.reset_index(drop=True)
 
 def save_top5_tables(summary_df: pd.DataFrame, out_csv_path: str) -> pd.DataFrame:
-    """Guarda el Top-5 a CSV y devuelve el DF del Top-5."""
     top5 = summary_df.head(5).copy()
     os.makedirs(os.path.dirname(out_csv_path), exist_ok=True)
     top5.to_csv(out_csv_path, index=False)
     return top5
 
 def plot_top5_drift_rate(top5_df: pd.DataFrame, out_png_path: str, split_name: str):
-    """
-    Grafica drift_rate de las Top-5 features.
-    """
+    
     if top5_df.empty:
         return
     plt.figure(figsize=(8, 3))
@@ -149,7 +162,7 @@ def plot_top5_drift_rate(top5_df: pd.DataFrame, out_png_path: str, split_name: s
     plot_df = top5_df.sort_values("drift_rate", ascending=True)
     plt.barh(plot_df["Feature"], plot_df["drift_rate"], color="cornflowerblue")
     plt.title(f"Top-5 drift rate — {split_name}")
-    plt.xlabel("Proporción de ventanas con p < α")
+    plt.xlabel("Window ratio with p < α")
     plt.tight_layout()
     os.makedirs(os.path.dirname(out_png_path), exist_ok=True)
     plt.savefig(out_png_path, dpi=130)

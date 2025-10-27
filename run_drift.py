@@ -7,8 +7,8 @@ from backtesting import backtest
 from data_drift import (infer_features, plot_histograms_all, pvalue_plots_from_results, summarize_drift, save_top5_tables, plot_top5_drift_rate)
 
 def run_drift_analysis():
-    ticker = "SONY"
-    alpha = 0.010
+    ticker = "DIS"
+    alpha = 0.005
     out_dir = "drift_simple_report"
     os.makedirs(out_dir, exist_ok=True)
 
