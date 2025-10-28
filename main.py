@@ -52,9 +52,9 @@ def main():
     val_data_np["signal"] = np.argmax(y_hat_val, axis=1)
 
     # --- Backtest ---
-    portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, _, _, _ = backtest(train_data_np, cash=1_000_000)
-    portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, _, _, _ = backtest(test_data_np, cash=1_000_000)
-    portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, _, _, _ = backtest(val_data_np, cash=final_cash_test)
+    portfolio_train, final_cash_train, win_rate_train, buy_train, sell_train, hold_train, total_train, _, _ = backtest(train_data_np, cash=1_000_000)
+    portfolio_test, final_cash_test, win_rate_test, buy_test, sell_test, hold_test, total_test, _, _ = backtest(test_data_np, cash=1_000_000)
+    portfolio_val, final_cash_val, win_rate_val, buy_val, sell_val, hold_val, total_val, _, _ = backtest(val_data_np, cash=final_cash_test)
 
     # --- Results ---
     print(f"\n--- RESULTS {model_name.upper()} ---")
@@ -64,9 +64,9 @@ def main():
 
     # --- Trade stats ---
     print(f"\n--- TRADE STATISTICS ---")
-    print(f"Train set→ Buys: {buy_train:,} | Sells: {sell_train:,} | Holds: {hold_train:,}")
-    print(f"Test set  → Buys: {buy_test:,} | Sells: {sell_test:,} | Holds: {hold_test:,}")
-    print(f"Val set   → Buys: {buy_val:,}  | Sells: {sell_val:,}  | Holds: {hold_val:,}")
+    print(f"Train set→ Buys: {buy_train:,} | Sells: {sell_train:,} | Holds: {hold_train:,}, | Total Trades: {total_train:,}")
+    print(f"Test set  → Buys: {buy_test:,} | Sells: {sell_test:,} | Holds: {hold_test:,}, | Total Trades: {total_test:,}")
+    print(f"Val set   → Buys: {buy_val:,}  | Sells: {sell_val:,}  | Holds: {hold_val:,}, | Total Trades: {total_val:,}")
 
     # --- Metrics---
     print(f"\n--- METRICS ---")

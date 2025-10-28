@@ -7,7 +7,7 @@ from backtesting import backtest
 from data_drift import (infer_features, plot_histograms_all, pvalue_plots_from_results, summarize_drift, save_top5_tables, plot_top5_drift_rate)
 
 def run_drift_analysis():
-    ticker = "DIS"
+    ticker = "NFLX"
     alpha = 0.005
     out_dir = "drift_simple_report"
     os.makedirs(out_dir, exist_ok=True)
@@ -26,12 +26,12 @@ def run_drift_analysis():
     x_val_f,   _ = get_target(val)
 
     # Backtest with drift detection
-    _, _, _, _, _, _, _, _, pvals_test = backtest(
+    _, cash_test, _, _, _, _, _, _, pvals_test = backtest(
         data=test, cash=1_000_000, x_train_f=x_train_f, x_test_f=x_test_f)
     pvalue_plots_from_results(pvals_test, alpha, out_dir, split_name="test")
 
-    _, _, _, _, _, _, _, _, pvals_val = backtest(
-        data=val, cash=1_000_000, x_train_f=x_train_f, x_test_f=x_val_f)
+    _, cash_val, _, _, _, _, _, _, pvals_val = backtest(
+        data=val, cash=cash_test, x_train_f=x_train_f, x_test_f=x_val_f)
     pvalue_plots_from_results(pvals_val, alpha, out_dir, split_name="val")
 
     # Summary tables  and top5

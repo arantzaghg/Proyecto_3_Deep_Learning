@@ -75,11 +75,11 @@ def plot_histograms_all(train_df: pd.DataFrame, test_df: pd.DataFrame, val_df: p
 
         plt.figure(figsize=(8, 3))
         bins = 30
-        plt.hist(a, bins=bins, alpha=0.4, density=True, label="train")
+        plt.hist(a, bins=bins, alpha=0.4, density=True, label="train", color="navy")
         if len(b) > 0:
-            plt.hist(b, bins=bins, alpha=0.4, density=True, label="test")
+            plt.hist(b, bins=bins, alpha=0.4, density=True, label="test", color="cornflowerblue")
         if c is not None and len(c) > 0:
-            plt.hist(c, bins=bins, alpha=0.4, density=True, label="val")
+            plt.hist(c, bins=bins, alpha=0.4, density=True, label="val", color="skyblue")
 
         plt.title(f"Histogram — {feat} (train vs test vs val)")
         plt.xlabel(feat)
