@@ -4,6 +4,18 @@ import pandas as pd
 
 def signals(data: pd.DataFrame, ticker: str, alpha: float) -> pd.DataFrame:
 
+    """
+    Generate trading signals based on future price movements.
+    
+    Parameters:
+    data (pd.DataFrame): DataFrame containing market data with 'Close' prices.
+    ticker (str): The ticker symbol of the asset.
+    alpha (float): Threshold for generating buy/sell signals.
+    
+    Returns:
+    pd.DataFrame: DataFrame with an additional 'signal' column.
+    """
+
     data = data.copy()
     data['Shift_10'] = data['Close'].shift(-10)
 

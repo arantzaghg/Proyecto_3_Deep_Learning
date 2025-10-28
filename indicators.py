@@ -4,6 +4,16 @@ import ta
 
 def get_indicators(data: pd.DataFrame) -> pd.DataFrame:
 
+    """
+    Calculate and add technical indicators to the market data.
+    
+    Parameters:
+    data (pd.DataFrame): DataFrame containing market data with 'Open', 'High', 'Low', 'Close', and 'Volume' columns.
+    
+    Returns:
+    pd.DataFrame: DataFrame with additional technical indicator columns.
+    """
+
     data = data.copy()
 
     ## Momentum Indicators

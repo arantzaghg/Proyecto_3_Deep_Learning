@@ -5,7 +5,29 @@ import pandas as pd
 
 def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = None, x_test_f: pd.DataFrame | None = None
 ) -> tuple[ pd.Series,float,float,int, int, int,int,list[dict], list[dict],]:
-
+    
+    """
+    Backtest a trading strategy based on signals in the data.
+    
+    Parameters:
+    data (pd.DataFrame): DataFrame containing 'Close' prices and 'signal' columns.
+    cash (float): Initial cash available for trading.
+    x_train_f (pd.DataFrame | None): Training feature set for data drift analysis.
+    x_test_f (pd.DataFrame | None): Testing feature set for data drift analysis.
+    
+    Returns:
+    tuple: A tuple containing:
+        - pd.Series: Portfolio value history.
+        - float: Final cash amount.
+        - float: Win rate of trades.
+        - int: Number of buy operations.
+        - int: Number of sell operations.
+        - int: Number of hold operations.
+        - int: Total number of trades executed.
+        - list[dict]: Data drift analysis results.
+        - list[dict]: P-values from data drift tests.   
+    """
+    
     stop_Loss = 0.06
     take_Profit = 0.13
     n_shares = 100

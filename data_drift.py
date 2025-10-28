@@ -6,15 +6,48 @@ import matplotlib.pyplot as plt
 
 
 def _ensure_dir(path: str):
+
+    """
+    Ensure that a directory exists; create it if it does not.
+    
+    Parameters:
+    path (str): The directory path to ensure.
+    
+    Returns:
+    None
+    """
+
     os.makedirs(path, exist_ok=True)
 
 def infer_features(df: pd.DataFrame) -> list[str]:
+
+    """
+    Infer numerical feature columns from a DataFrame, excluding specific known columns.
+    
+    Parameters:
+    df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+    list[str]: List of inferred feature column names.
+    """
     
     cols = df.select_dtypes(include=[np.number]).columns.tolist()
     drop_cols = {"Open", "High", "Low", "Close", "Volume", "signal", "final_signal"}
     return [c for c in cols if c not in drop_cols]
 
 def _ks(a: np.ndarray, b: np.ndarray) -> tuple[float, float]:
+
+    """ 
+    Perform the Kolmogorov-Smirnov test between two arrays.
+    
+    Parameters:
+    a (np.ndarray): First array of data.
+    b (np.ndarray): Second array of data.
+    
+    Returns:
+    tuple[float, float]: KS statistic and p-value.
+    """
+
     a = a[~np.isnan(a)]
     b = b[~np.isnan(b)]
     if len(a) == 0 or len(b) == 0:
@@ -23,6 +56,18 @@ def _ks(a: np.ndarray, b: np.ndarray) -> tuple[float, float]:
     return float(stat), float(p)
 
 def calculate_drift_metrics(x_train_f: pd.DataFrame, x_test_f: pd.DataFrame, alpha: float = 0.05):
+
+    """
+    Calculate drift metrics between training and testing feature sets using the KS test.
+    
+    Parameters:
+    x_train_f (pd.DataFrame): Training feature set.
+    x_test_f (pd.DataFrame): Testing feature set.
+    alpha (float): Significance level for drift detection.
+
+    Returns:
+    list[dict]: List of drift metrics for each feature.
+    """
   
     ref = x_train_f.copy()
     cmp = x_test_f.copy()
@@ -41,6 +86,17 @@ def calculate_drift_metrics(x_train_f: pd.DataFrame, x_test_f: pd.DataFrame, alp
     return out
 
 def calculate_drift_pvalues(x_train_f: pd.DataFrame, x_test_f: pd.DataFrame):
+
+    """
+    Calculate KS test p-values between training and testing feature sets.
+    
+    Parameters:
+    x_train_f (pd.DataFrame): Training feature set.
+    x_test_f (pd.DataFrame): Testing feature set.
+
+    Returns:
+    dict: Dictionary of features and their corresponding KS p-values.
+    """
    
     ref = x_train_f.copy()
     cmp = x_test_f.copy()
@@ -54,6 +110,20 @@ def calculate_drift_pvalues(x_train_f: pd.DataFrame, x_test_f: pd.DataFrame):
     return out
 
 def plot_histograms_all(train_df: pd.DataFrame, test_df: pd.DataFrame, val_df: pd.DataFrame | None, features: list[str], out_dir: str = "drift_simple_report"):
+
+    """
+    Plot histograms of features for training, testing, and validation datasets.
+
+    Parameters:
+    train_df (pd.DataFrame): Training dataset.
+    test_df (pd.DataFrame): Testing dataset.
+    val_df (pd.DataFrame | None): Validation dataset.
+    features (list[str]): List of feature names to plot.
+    out_dir (str): Output directory to save plots.
+    
+    Returns:
+    None
+    """
    
     _ensure_dir(os.path.join(out_dir, "plots"))
 
@@ -90,6 +160,20 @@ def plot_histograms_all(train_df: pd.DataFrame, test_df: pd.DataFrame, val_df: p
         plt.close()
 
 def pvalue_plots_from_results(pvalues_windows: list[dict], alpha: float, out_dir: str, split_name: str = "backtest"):
+
+    """
+    Generate and save p-value plots for each feature from KS test results.
+    
+    Parameters:
+    pvalues_windows (list[dict]): List of dictionaries containing KS test results.
+    alpha (float): Significance level for drift detection.
+    out_dir (str): Output directory to save plots.
+    split_name (str): Name of the data split for labeling plots.
+    
+    Returns:
+    None
+    """
+
     if not pvalues_windows:
         return
 
@@ -122,6 +206,17 @@ def pvalue_plots_from_results(pvalues_windows: list[dict], alpha: float, out_dir
         plt.close()
 
 def summarize_drift(pvalues_windows: list[dict], alpha: float) -> pd.DataFrame:
+
+    """
+    Summarize drift statistics from KS test p-values across multiple windows.
+    
+    Parameters:
+    pvalues_windows (list[dict]): List of dictionaries containing KS test results.
+    alpha (float): Significance level for drift detection.
+
+    Returns:
+    pd.DataFrame: Summary DataFrame with drift statistics for each feature.
+    """
     
     if not pvalues_windows:
         return pd.DataFrame(columns=["Feature","windows","below_alpha","drift_rate","min_pvalue","median_pvalue"])
@@ -144,12 +239,36 @@ def summarize_drift(pvalues_windows: list[dict], alpha: float) -> pd.DataFrame:
     return agg.reset_index(drop=True)
 
 def save_top5_tables(summary_df: pd.DataFrame, out_csv_path: str) -> pd.DataFrame:
+
+    """
+    Save the top-5 features with the highest drift rates to a CSV file.
+
+    Parameters:
+    summary_df (pd.DataFrame): Summary DataFrame with drift statistics.
+    out_csv_path (str): Output CSV file path.
+
+    Returns:
+    pd.DataFrame: DataFrame containing the top-5 features with highest drift rates.
+    """
+
     top5 = summary_df.head(5).copy()
     os.makedirs(os.path.dirname(out_csv_path), exist_ok=True)
     top5.to_csv(out_csv_path, index=False)
     return top5
 
 def plot_top5_drift_rate(top5_df: pd.DataFrame, out_png_path: str, split_name: str):
+
+    """
+    Plot and save a horizontal bar chart of the top-5 features with the highest drift rates.
+    
+    Parameters:
+    top5_df (pd.DataFrame): DataFrame containing the top-5 features with highest drift rates.
+    out_png_path (str): Output PNG file path.
+    split_name (str): Name of the data split for labeling the plot.
+
+    Returns:
+    None
+    """
     
     if top5_df.empty:
         return

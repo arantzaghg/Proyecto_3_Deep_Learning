@@ -4,6 +4,18 @@ import numpy as np
 from sklearn.metrics import f1_score, accuracy_score
 
 def build_model(params, input_shape):
+
+    """
+    Builds and compiles a CNN model based on the provided parameters.
+    
+    Parameters:
+    params (dict): Dictionary containing model hyperparameters.
+    input_shape (int): The shape of the input data.
+    
+    Returns:
+    tf.keras.Model: Compiled CNN model.
+    """
+
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Input(shape=(input_shape, 1)))
 
@@ -26,6 +38,14 @@ def build_model(params, input_shape):
     return model
 
 def get_params_space_cnn():
+
+    """
+    Defines a list of hyperparameter combinations for CNN model training.
+    
+    Returns:
+    list[dict]: List of dictionaries containing different hyperparameter settings.
+    """
+
     return [
         {"conv_layers": 3, "conv_filters": 64,  "activation": "sigmoid", "dense_units": 96},  
         {"conv_layers": 3, "conv_filters": 96,  "activation": "sigmoid", "dense_units": 128},   
@@ -35,6 +55,24 @@ def get_params_space_cnn():
 
 
 def train_signals_cnn(X_train, y_train, X_test, y_test, X_val, y_val, params_cnn, epochs=10, batch_size=32):
+
+    """
+    Trains multiple CNN models with different hyperparameters and logs results to MLflow.
+
+    Parameters:
+    X_train (np.ndarray): Training feature set.
+    y_train (np.ndarray): Training labels.
+    X_test (np.ndarray): Testing feature set.
+    y_test (np.ndarray): Testing labels.
+    X_val (np.ndarray): Validation feature set.
+    y_val (np.ndarray): Validation labels.
+    params_cnn (list[dict]): List of hyperparameter combinations for CNN models.
+    epochs (int): Number of training epochs.
+    batch_size (int): Size of training batches.
+
+    Returns:
+    None
+    """
 
     input_shape = X_train.shape[1]  
 
