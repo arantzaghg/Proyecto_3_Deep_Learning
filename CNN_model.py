@@ -27,9 +27,10 @@ def build_model(params, input_shape):
 
 def get_params_space_cnn():
     return [
-        {"conv_layers": 3, "conv_filters": 96,  "activation": "elu", "dense_units": 128},  
-        {"conv_layers": 3, "conv_filters": 32,  "activation": "sigmoid", "dense_units": 64},   
-        {"conv_layers": 2, "conv_filters": 64,  "activation": "relu", "dense_units": 64},  
+        {"conv_layers": 3, "conv_filters": 64,  "activation": "sigmoid", "dense_units": 96},  
+        {"conv_layers": 3, "conv_filters": 96,  "activation": "sigmoid", "dense_units": 128},   
+        {"conv_layers": 3, "conv_filters": 64,  "activation": "relu", "dense_units": 128}, 
+        {"conv_layers": 3, "conv_filters": 64, "activation": "sigmoid", "dense_units": 128}, 
     ]
 
 

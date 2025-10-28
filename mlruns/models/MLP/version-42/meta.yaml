@@ -1,0 +1,15 @@
+creation_timestamp: 1761590171212
+current_stage: None
+deployment_job_state: null
+description: ''
+last_updated_timestamp: 1761590171212
+model_id: m-39af595ed62d40eeb540d094ce3c966e
+name: MLP
+run_id: 3b636487341949d784eed677b40e15ce
+run_link: ''
+source: file:///C:/Users/Alejandro/Documents/ITESO/Proyecto_3_Deep_Learning/mlruns/166689124451334581/models/m-39af595ed62d40eeb540d094ce3c966e/artifacts
+status: READY
+status_message: null
+storage_location: file:///C:/Users/Alejandro/Documents/ITESO/Proyecto_3_Deep_Learning/mlruns/166689124451334581/models/m-39af595ed62d40eeb540d094ce3c966e/artifacts
+user_id: null
+version: 42

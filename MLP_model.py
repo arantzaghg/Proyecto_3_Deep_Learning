@@ -27,9 +27,10 @@ def build_model(params, input_shape):
 
 def get_params_space_mlp():
     return [
-        {"dense_layers": 2, "dense_units": 64, "activation": "relu"},
         {"dense_layers": 3, "dense_units": 32, "activation": "relu"},
         {"dense_layers": 2, "dense_units": 64, "activation": "sigmoid"},
+        {"dense_layers": 3, "dense_units": 128, "activation": "relu"},
+        {"dense_layers": 3, "dense_units": 256, "activation": "elu"},
     ]
 
 

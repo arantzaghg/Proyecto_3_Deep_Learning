@@ -6,8 +6,8 @@ import pandas as pd
 def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = None, x_test_f: pd.DataFrame | None = None
 ) -> tuple[ pd.Series,float,float,int, int, int,int,list[dict], list[dict],]:
 
-    stop_Loss = 0.08
-    take_Profit = 0.14
+    stop_Loss = 0.06
+    take_Profit = 0.13
     n_shares = 100
     COM = 0.125 / 100
     BORROW_RATE = (0.25 / 100)/252
@@ -27,7 +27,7 @@ def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = No
     
     windows = 90
     steps = 60
-    alpha = 0.010
+    alpha = 0.05
     data_drift_results: list[dict] = []
     p_values_results: list[dict] = []
 

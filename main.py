@@ -11,18 +11,18 @@ from metrics import all_metrics
 def main():
     
     # Get Data
-    ticker = "DIS"
+    ticker = "NFLX"
     data = get_asset_data(ticker)
     train, test, val = split_data(data)
 
-    train_data, stats = preprocess_data(train, ticker, alpha=0.0017, stage="train", include_close=True)
-    test_data, _ = preprocess_data(test, ticker, alpha=0.0017, stage="test", stats=stats, include_close=True)
-    val_data, _ = preprocess_data(val, ticker, alpha=0.0017, stage="val", stats=stats, include_close=True)
+    train_data, stats = preprocess_data(train, ticker, alpha=0.014, stage="train", include_close=True)
+    test_data, _ = preprocess_data(test, ticker, alpha=0.014, stage="test", stats=stats, include_close=True)
+    val_data, _ = preprocess_data(val, ticker, alpha=0.014, stage="val", stats=stats, include_close=True)
 
     # preprocess without normalization prices
-    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.0017, stage="train", include_close=False)
-    test_data_np, _ = preprocess_data(test, ticker, alpha=0.0017, stage="test", stats=stats_np, include_close=False)
-    val_data_np, _ = preprocess_data(val, ticker, alpha=0.0017, stage="val", stats=stats_np, include_close=False)
+    train_data_np, stats_np = preprocess_data(train, ticker, alpha=0.014, stage="train", include_close=False)
+    test_data_np, _ = preprocess_data(test, ticker, alpha=0.014, stage="test", stats=stats_np, include_close=False)
+    val_data_np, _ = preprocess_data(val, ticker, alpha=0.014, stage="val", stats=stats_np, include_close=False)
 
     # Get target
     x_train, y_train = get_target(train_data)
@@ -30,7 +30,10 @@ def main():
     x_val, y_val = get_target(val_data)
 
     model_name = "CNN"
-    version = 47
+    version = 78
+
+
+
 
     print(f"\n==============================")
     print(f" Evaluating model: {model_name} (version {version})")
