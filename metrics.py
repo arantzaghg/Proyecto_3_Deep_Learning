@@ -4,15 +4,15 @@ import pandas as pd
 
 def sharpe_ratio(portfolio_hist) -> float:
 
-    '''
+    """
     Calculate the Sharpe Ratio of a portfolio.
     
     Parameters:
-    - portfolio_hist (pd.Series): Series representing the portfolio value over time.
+    portfolio_hist (pd.Series): Series representing the portfolio value over time.
     
     Returns:
-    - float: Sharpe Ratio of the portfolio.
-    '''
+    float: Sharpe Ratio of the portfolio.
+    """
 
     returns = portfolio_hist.pct_change(fill_method = None).dropna()
     mean_return = returns.mean()
@@ -26,15 +26,15 @@ def sharpe_ratio(portfolio_hist) -> float:
 
 def sortino_ratio(portfolio_hist) -> float:
 
-    '''
+    """
     Calculate the Sortino Ratio of a portfolio.
     
     Parameters:
-    - portfolio_hist (pd.Series): Series representing the portfolio value over time.
+    portfolio_hist (pd.Series): Series representing the portfolio value over time.
     
     Returns:
-    - float: Sortino Ratio of the portfolio.
-    '''
+    float: Sortino Ratio of the portfolio.
+    """
 
     returns = portfolio_hist.pct_change(fill_method = None).dropna()
     mean_return = returns.mean()
@@ -48,15 +48,15 @@ def sortino_ratio(portfolio_hist) -> float:
 
 def maximum_drawdown(portfolio_hist) -> float:
 
-    '''
+    """
     Calculate the Maximum Drawdown of a portfolio.
     
     Parameters:
-    - portfolio_hist (pd.Series): Series representing the portfolio value over time.
+    portfolio_hist (pd.Series): Series representing the portfolio value over time.
     
     Returns:
-    - float: Maximum Drawdown of the portfolio.
-    '''
+    float: Maximum Drawdown of the portfolio.
+    """
 
     rolling_max = portfolio_hist.cummax()
     drawdown = (rolling_max - portfolio_hist) / rolling_max
@@ -67,15 +67,15 @@ def maximum_drawdown(portfolio_hist) -> float:
 
 def calmar_ratio(portfolio_hist) -> float:
 
-    '''
+    """
     Calculate the Calmar Ratio of a portfolio.
 
     Parameters:
-    - portfolio_hist (pd.Series): Series representing the portfolio value over time.
+    portfolio_hist (pd.Series): Series representing the portfolio value over time.
 
     Returns:
-    - float: Calmar Ratio of the portfolio.
-    '''
+    float: Calmar Ratio of the portfolio.
+    """
 
     returns = portfolio_hist.pct_change(fill_method = None).dropna()
     mean_return = returns.mean()
@@ -88,15 +88,15 @@ def calmar_ratio(portfolio_hist) -> float:
 
 def all_metrics(portfolio_value) -> pd.DataFrame:
 
-    '''
+    """
     Calculate all performance metrics for a portfolio.
     
     Parameters:
-    - portfolio_value (pd.Series): Series representing the portfolio value over time.
+    portfolio_value (pd.Series): Series representing the portfolio value over time.
     
     Returns:
-    - pd.DataFrame: DataFrame containing all performance metrics.
-    '''
+    pd.DataFrame: DataFrame containing all performance metrics.
+    """
 
     metrics = pd.DataFrame({
         'Sharpe Ratio': sharpe_ratio(portfolio_value),
