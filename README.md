@@ -81,16 +81,16 @@ Proyecto_3_Deep_Learning/
 ## Setup (recommended: virtual environment)
 
 bash
-# 1) Clone
+## 1) Clone
 git clone https://github.com/arantzaghg/Proyecto_3_Deep_Learning.git
 cd Proyecto_3_Deep_Learning
 
-# 2) Create & activate a virtual env (choose one)
+## 2) Create & activate a virtual env (choose one)
 python3 -m venv .venv && source .venv/bin/activate      # macOS/Linux (bash/zsh)
-# OR (conda)
-# conda create -n dl-trading python=3.10 -y && conda activate dl-trading
+## OR (conda)
+## conda create -n dl-trading python=3.10 -y && conda activate dl-trading
 
-# 3) Install project dependencies
+## 3) Install project dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
 
