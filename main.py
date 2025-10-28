@@ -32,9 +32,6 @@ def main():
     model_name = "CNN"
     version = 78
 
-
-
-
     print(f"\n==============================")
     print(f" Evaluating model: {model_name} (version {version})")
     print(f"==============================")

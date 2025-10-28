@@ -12,7 +12,7 @@ def run_drift_analysis():
     out_dir = "drift_simple_report"
     os.makedirs(out_dir, exist_ok=True)
 
-    # Datos y splits
+    # Data and Splits
     data = get_asset_data(ticker)
     train, test, val = split_data(data)
 
@@ -25,7 +25,7 @@ def run_drift_analysis():
     x_test_f,  _ = get_target(test)
     x_val_f,   _ = get_target(val)
 
-    # Backtest con drift
+    # Backtest with drift detection
     _, _, _, _, _, _, _, _, pvals_test = backtest(
         data=test, cash=1_000_000, x_train_f=x_train_f, x_test_f=x_test_f)
     pvalue_plots_from_results(pvals_test, alpha, out_dir, split_name="test")
@@ -34,7 +34,7 @@ def run_drift_analysis():
         data=val, cash=1_000_000, x_train_f=x_train_f, x_test_f=x_val_f)
     pvalue_plots_from_results(pvals_val, alpha, out_dir, split_name="val")
 
-    # Summary tables y top5
+    # Summary tables  and top5
     summary_test = summarize_drift(pvals_test, alpha=alpha)
     top5_test = save_top5_tables(summary_test, os.path.join(out_dir, "top5_test.csv"))
     plot_top5_drift_rate(top5_test, os.path.join(out_dir, "plots", "top5_test.png"), split_name="test")

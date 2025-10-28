@@ -6,7 +6,7 @@ def get_indicators(data: pd.DataFrame) -> pd.DataFrame:
 
     data = data.copy()
 
-    ## Indicadores de Momentum
+    ## Momentum Indicators
 
     data["RSI_7"] = ta.momentum.RSIIndicator(close=data["Close"], window=7).rsi()
     data["RSI_14"] = ta.momentum.RSIIndicator(close=data["Close"], window=14).rsi()
@@ -23,7 +23,7 @@ def get_indicators(data: pd.DataFrame) -> pd.DataFrame:
     data['Stoch_26'] = ta.momentum.StochasticOscillator(high=data["High"], low=data["Low"], close=data["Close"], window=26).stoch()
     data['Stoch_40'] = ta.momentum.StochasticOscillator(high=data["High"], low=data["Low"], close=data["Close"], window=40).stoch()
     
-    ## Indicadores de Volatilidad
+    ## Volatility Indicators
 
     data['ATR_14'] =  ta.volatility.AverageTrueRange(high=data["High"], low=data["Low"], close=data["Close"], window=14).average_true_range()
 
@@ -39,7 +39,7 @@ def get_indicators(data: pd.DataFrame) -> pd.DataFrame:
     data["DON_high_20"] = don.donchian_channel_hband()  
     data["DON_low_20"] = don.donchian_channel_lband()
 
-    # Indicadores de volumen
+    # Volume Indicators
 
     data["OBV"] = ta.volume.OnBalanceVolumeIndicator(close=data["Close"], volume=data["Volume"]).on_balance_volume()
 

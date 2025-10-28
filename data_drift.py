@@ -1,4 +1,3 @@
-
 import os
 import numpy as np
 import pandas as pd
@@ -97,13 +96,11 @@ def pvalue_plots_from_results(pvalues_windows: list[dict], alpha: float, out_dir
     df = pd.DataFrame(pvalues_windows)
     _ensure_dir(os.path.join(out_dir, "plots"))
 
-    # Si existe la columna de fecha, la convertimos una vez
     has_date = "WindowStartDate" in df.columns
     if has_date:
         df["WindowStartDate"] = pd.to_datetime(df["WindowStartDate"], errors="coerce")
 
     for feat, grp in df.groupby("Feature"):
-        # Ordenar por fecha si hay fecha; si no, por índice
         if has_date:
             grp = grp.sort_values(["WindowStartDate", "WindowStartIdx"])
             x_vals = grp["WindowStartDate"]
@@ -143,7 +140,6 @@ def summarize_drift(pvalues_windows: list[dict], alpha: float) -> pd.DataFrame:
               median_pvalue=("KS_pvalue", "median"),
           )
     )
-    # Orden principal: mayor tasa de drift; desempate: menor p-valor mínimo
     agg = agg.sort_values(["drift_rate", "min_pvalue"], ascending=[False, True], kind="mergesort")
     return agg.reset_index(drop=True)
 
@@ -158,7 +154,6 @@ def plot_top5_drift_rate(top5_df: pd.DataFrame, out_png_path: str, split_name: s
     if top5_df.empty:
         return
     plt.figure(figsize=(8, 3))
-    # Ordenamos de mayor a menor para una barra más clara
     plot_df = top5_df.sort_values("drift_rate", ascending=True)
     plt.barh(plot_df["Feature"], plot_df["drift_rate"], color="cornflowerblue")
     plt.title(f"Top-5 drift rate — {split_name}")

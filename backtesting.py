@@ -75,7 +75,7 @@ def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = No
                         type='LONG'
                     )
                 )
-
+        # Short signal
         if row.signal == 2:
             cost = row.Close * n_shares * COM
             if cash > cost:
@@ -94,7 +94,7 @@ def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = No
         else:
             hold += 1
 
-        
+        # Update portfolio value
         port_hist.append(get_portfolio_value(cash, active_long_positions, active_short_positions, row.Close, n_shares))
 
         # Data Drift 
@@ -104,11 +104,8 @@ def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = No
                 initial = idx - windows
                 end = idx
 
-                # Ventana de comparación en TEST
                 df_with_window = x_test_f.iloc[initial:end]
 
-                # === Fechas (si el índice es convertible a datetime) ===
-                # Tomamos la fecha de inicio (fila 'initial') y fin (fila 'end-1')
                 try:
                     start_dt = pd.to_datetime(x_test_f.index[initial], errors="coerce")
                     end_dt   = pd.to_datetime(x_test_f.index[end - 1], errors="coerce")
@@ -123,9 +120,8 @@ def backtest(data: pd.DataFrame,cash: float, x_train_f: pd.DataFrame | None = No
                     out_row = dict(rec)
                     out_row["WindowStartIdx"] = initial
                     out_row["WindowEndIdx"] = end
-                    # Guarda las fechas si son válidas
                     if pd.notna(start_dt):
-                        out_row["WindowStartDate"] = start_dt  # o start_dt.date() si solo quieres fecha
+                        out_row["WindowStartDate"] = start_dt  
                     if pd.notna(end_dt):
                         out_row["WindowEndDate"] = end_dt
                     data_drift_results.append(out_row)

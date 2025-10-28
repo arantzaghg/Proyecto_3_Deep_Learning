@@ -54,7 +54,6 @@ def plot_individual_bars(buy: int, sell: int, hold: int):
     plt.figure(figsize=(6, 4))
     bars = plt.bar(categories, percentage, color=colors)
 
-    # Mostrar los porcentajes arriba de cada barra
     for bar, pct in zip(bars, percentage):
         plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
                  f'{pct:.1f}%', ha='center', va='bottom', fontweight='bold')
