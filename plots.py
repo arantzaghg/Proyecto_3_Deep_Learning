@@ -3,6 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def plot_portfolio_value(portfolio_value, title: str):
+    """
+    Plot the portfolio value over time.
+    
+    Parameters:
+    portfolio_value: Series or array-like of portfolio values.
+    title: Title for the plot.
+    """
 
     plt.figure(figsize=(10, 5))
     plt.plot(portfolio_value,  color='skyblue', linewidth=1.8, label='Portfolio')
@@ -14,6 +21,15 @@ def plot_portfolio_value(portfolio_value, title: str):
 
 
 def plot_test_validation(test_portfolio, validation_portfolio, test, validation):
+    """
+    Plot portfolio values for test and validation periods.
+
+    Parameters:
+    test_portfolio: Series or array-like of portfolio values during the test period.
+    validation_portfolio: Series or array-like of portfolio values during the validation period.
+    test: DataFrame containing test period data with datetime index.
+    validation: DataFrame containing validation period data with datetime index.
+    """
     
     
     test.index = pd.to_datetime(test.index)
@@ -44,6 +60,14 @@ def plot_test_validation(test_portfolio, validation_portfolio, test, validation)
 
 
 def plot_individual_bars(buy: int, sell: int, hold: int):
+    """
+    Plot a bar chart showing the distribution of Buy, Sell, and Hold actions.
+    
+    Parameters:
+    buy: Number of Buy actions.
+    sell: Number of Sell actions.
+    hold: Number of Hold actions.
+    """
     
     categories = ['Buy', 'Sell', 'Hold']
     values = np.array([buy, sell, hold], dtype=float)
@@ -66,6 +90,12 @@ def plot_individual_bars(buy: int, sell: int, hold: int):
 
 
 def plot_returns(portfolio: pd.Series):
+    """
+    Plot daily, monthly, and annual returns as bar charts.
+    
+    Parameters:
+    portfolio: Series or array-like of portfolio values.
+    """
 
     daily_ret = portfolio.pct_change() * 100
 

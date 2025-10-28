@@ -4,6 +4,17 @@ import pandas as pd
 import pandas as pd
 
 def get_normal_stats(data: pd.DataFrame, include_close: bool = False) -> tuple[pd.DataFrame, dict]:
+    """
+    Compute normalization statistics and normalize the data.
+    
+    Parameters:
+    data: DataFrame containing the features to be normalized.
+    include_close: Whether to include 'Close' price normalization.
+    
+    Returns:
+    normalized_data: DataFrame with normalized features.
+    stats: Dictionary containing normalization statistics.
+    """
     data = data.copy()
     stats = {}
 
@@ -75,6 +86,18 @@ def get_normal_stats(data: pd.DataFrame, include_close: bool = False) -> tuple[p
 
 
 def normalize_data(data: pd.DataFrame, stats: dict, include_close: bool = False) -> pd.DataFrame:
+    """
+    Normalize the features in the DataFrame using the provided statistics.
+
+    Parameters:
+    data: DataFrame containing the features to be normalized.
+    stats: Dictionary containing normalization statistics.
+    include_close: Whether to include 'Close' price normalization.
+
+    Returns:
+    DataFrame with normalized features.
+    """
+    
     data = data.copy()
 
     # Scale to range [0, 1]

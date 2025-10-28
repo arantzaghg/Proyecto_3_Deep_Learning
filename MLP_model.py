@@ -4,7 +4,17 @@ from sklearn.metrics import  f1_score, accuracy_score
 import numpy as np
 
 
-def build_model(params, input_shape):
+def build_model(params, input_shape): 
+    """
+    Build a simple MLP model based on the provided parameters.
+    
+    Parameters:
+    params: Dictionary containing model parameters such as number of layers, units, and activation function.
+    input_shape: Shape of the input data.
+    
+    Returns:
+    model: Compiled Keras model.
+    """
 
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Input(shape=(input_shape,)))
@@ -26,6 +36,12 @@ def build_model(params, input_shape):
 
 
 def get_params_space_mlp():
+    """
+    Get the hyperparameter search space for the MLP model.
+    
+    Returns:
+    List of dictionaries, each containing a set of hyperparameters.
+    """
     return [
         {"dense_layers": 3, "dense_units": 32, "activation": "relu"},
         {"dense_layers": 2, "dense_units": 64, "activation": "sigmoid"},
@@ -35,6 +51,20 @@ def get_params_space_mlp():
 
 
 def train_signals_mlp(X_train, y_train, X_test, y_test, X_val, y_val, params_mlp, epochs=10, batch_size=32):
+    """
+    Train MLP models with different hyperparameters and log results to MLflow.
+
+    Parameters:
+    X_train, y_train: Training data and labels.
+    X_test, y_test: Test data and labels.
+    X_val, y_val: Validation data and labels.
+    params_mlp: List of hyperparameter dictionaries for model training.
+    epochs: Number of training epochs.
+    batch_size: Size of training batches.
+    
+    Returns:
+    None
+    """
 
     input_shape = X_train.shape[1]
 
