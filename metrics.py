@@ -18,8 +18,8 @@ def sharpe_ratio(portfolio_hist) -> float:
     mean_return = returns.mean()
     std_return = returns.std()
         
-    annual_return = mean_return * 365
-    annual_std = std_return * np.sqrt(365)
+    annual_return = mean_return * 252
+    annual_std = std_return * np.sqrt(252)
     
     return annual_return / annual_std if annual_std > 0 else 0
 
@@ -40,8 +40,8 @@ def sortino_ratio(portfolio_hist) -> float:
     mean_return = returns.mean()
     downside_dev = returns[returns < 0].std()
 
-    annual_return = mean_return * 365
-    annual_downside_dev = downside_dev * np.sqrt(365)
+    annual_return = mean_return * 252
+    annual_downside_dev = downside_dev * np.sqrt(252)
 
     return annual_return / annual_downside_dev if annual_downside_dev > 0 else 0
     
@@ -79,7 +79,7 @@ def calmar_ratio(portfolio_hist) -> float:
 
     returns = portfolio_hist.pct_change(fill_method = None).dropna()
     mean_return = returns.mean()
-    annual_return = mean_return * 365  
+    annual_return = mean_return * 252
 
     max_drawdown = maximum_drawdown(portfolio_hist)
     
